@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Booking } from '@/lib/types';
 import { BookingService } from '@/lib/services/bookingService';
 
@@ -7,7 +7,7 @@ export const useBookings = (groundId?: string) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshBookings = () => {
+  const refreshBookings = useCallback(() => {
     try {
       setIsLoading(true);
       setError(null);
@@ -18,11 +18,11 @@ export const useBookings = (groundId?: string) => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [groundId]);
 
   useEffect(() => {
     refreshBookings();
-  }, [groundId]);
+  }, [groundId, refreshBookings]);
 
   const cancelBooking = (bookingId: string) => {
     try {

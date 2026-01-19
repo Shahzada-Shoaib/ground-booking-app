@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { Ground, Booking } from '@/lib/types';
 import { BookingService } from '@/lib/services/bookingService';
 
@@ -21,39 +21,46 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [currentGround, setCurrentGround] = useState<Ground | null>(null);
 
-  const refreshGrounds = () => {
+  const refreshGrounds = useCallback(() => {
     const allGrounds = BookingService.getAllGrounds();
     setGrounds(allGrounds);
     
     // If no current ground and grounds exist, set the first one
-    if (!currentGround && allGrounds.length > 0) {
-      setCurrentGround(allGrounds[0]);
-    }
-  };
+    // Use functional update to avoid dependency on currentGround
+    setCurrentGround(prev => {
+      if (!prev && allGrounds.length > 0) {
+        return allGrounds[0];
+      }
+      return prev;
+    });
+  }, []);
 
-  const refreshBookings = () => {
+  const refreshBookings = useCallback(() => {
     const allBookings = BookingService.getBookings();
     setBookings(allBookings);
-  };
+  }, []);
 
-  const deleteGround = (id: string): boolean => {
+  const deleteGround = useCallback((id: string): boolean => {
     const success = BookingService.deleteGround(id);
     if (success) {
       // If deleted ground was current, set to first available or null
-      if (currentGround?.id === id) {
-        const remainingGrounds = BookingService.getAllGrounds();
-        setCurrentGround(remainingGrounds.length > 0 ? remainingGrounds[0] : null);
-      }
+      setCurrentGround(prev => {
+        if (prev?.id === id) {
+          const remainingGrounds = BookingService.getAllGrounds();
+          return remainingGrounds.length > 0 ? remainingGrounds[0] : null;
+        }
+        return prev;
+      });
       refreshGrounds();
       return true;
     }
     return false;
-  };
+  }, [refreshGrounds]);
 
   useEffect(() => {
     refreshGrounds();
     refreshBookings();
-  }, []);
+  }, [refreshGrounds, refreshBookings]);
 
   return (
     <BookingContext.Provider
