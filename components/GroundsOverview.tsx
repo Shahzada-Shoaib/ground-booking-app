@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useBookingContext } from '@/context/BookingContext';
 import { BookingService } from '@/lib/services/bookingService';
@@ -12,6 +12,7 @@ import { getBookingUrl } from '@/lib/utils/urlUtils';
 export const GroundsOverview: React.FC = () => {
   const { grounds, deleteGround, refreshGrounds } = useBookingContext();
   const router = useRouter();
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleManageGround = (groundId: string) => {
     router.push(`/admin/grounds/${groundId}`);
@@ -31,6 +32,28 @@ export const GroundsOverview: React.FC = () => {
     const totalBookings = groundBookings.length;
     const totalRevenue = groundBookings.reduce((sum, b) => sum + b.totalPrice, 0);
     return { totalBookings, totalRevenue };
+  };
+
+  const handleCopyLink = async (groundId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = getBookingUrl(groundId);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(groundId);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedId(groundId);
+      setTimeout(() => setCopiedId(null), 2000);
+    }
   };
 
   return (
@@ -70,18 +93,18 @@ export const GroundsOverview: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {grounds.map((g) => {
               const stats = getGroundStats(g.id);
               return (
                 <div
                   key={g.id}
-                  className="p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-green-300 hover:shadow-md transition-all"
+                  className="p-3 sm:p-4 rounded-xl border-2 border-gray-200 bg-white hover:border-green-300 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-lg text-gray-900">{g.name}</h3>
+                        <h3 className="font-bold text-base sm:text-lg text-gray-900 truncate">{g.name}</h3>
                       </div>
                       <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${getGroundTypeColor(g.type || 'other')}`}>
                         {getGroundTypeLabel(g.type || 'other')}
@@ -124,9 +147,17 @@ export const GroundsOverview: React.FC = () => {
                       </svg>
                       Manage Ground
                     </Button>
-                    <p className="text-xs text-gray-500 text-center">
-                      Booking: <span className="font-mono text-green-600">{getBookingUrl(g.id)}</span>
-                    </p>
+                    <div 
+                      onClick={(e) => handleCopyLink(g.id, e)}
+                      className="cursor-pointer group"
+                      title="Click to copy booking link"
+                    >
+                      <p className="text-xs text-gray-500 text-center break-words">
+                        Booking: <span className={`font-mono break-all transition-colors ${copiedId === g.id ? 'text-green-700 font-bold' : 'text-green-600 group-hover:text-green-700'}`}>
+                          {copiedId === g.id ? 'Copied!' : getBookingUrl(g.id)}
+                        </span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               );

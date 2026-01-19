@@ -55,6 +55,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     shareLink: false,
     bookings: false,
   });
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const { showSuccess, showError, toasts, removeToast } = useToast();
   const { bookings, isLoading, refreshBookings, cancelBooking } = useBookings(ground?.id);
 
@@ -252,6 +253,30 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     return { totalBookings, totalRevenue };
   };
 
+  const handleCopyLink = async (groundId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const url = getBookingUrl(groundId);
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedId(groundId);
+      showSuccess('Booking link copied to clipboard!');
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = url;
+      textArea.style.position = 'fixed';
+      textArea.style.opacity = '0';
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedId(groundId);
+      showSuccess('Booking link copied to clipboard!');
+      setTimeout(() => setCopiedId(null), 2000);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Grounds List */}
@@ -291,14 +316,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
               {grounds.map((g) => {
                 const stats = getGroundStats(g.id);
                 const isSelected = ground?.id === g.id;
                 return (
                   <div
                     key={g.id}
-                    className={`p-4 rounded-xl border-2 transition-all cursor-pointer ${
+                    className={`p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
                       isSelected
                         ? 'border-green-500 bg-green-50 shadow-lg'
                         : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
@@ -308,7 +333,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-bold text-lg text-gray-900">{g.name}</h3>
+                          <h3 className="font-bold text-base sm:text-lg text-gray-900 truncate">{g.name}</h3>
                           {isSelected && (
                             <span className="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded-full">
                               Active
@@ -347,9 +372,15 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                     </div>
                     <div className="pt-3 border-t border-gray-200">
                       <p className="text-xs text-gray-500 mb-1">Booking Link:</p>
-                      <p className="text-xs font-mono text-green-600 truncate">
-                        {getBookingUrl(g.id)}
-                      </p>
+                      <div 
+                        onClick={(e) => handleCopyLink(g.id, e)}
+                        className="cursor-pointer group"
+                        title="Click to copy booking link"
+                      >
+                        <p className={`text-xs font-mono break-all overflow-hidden transition-colors ${copiedId === g.id ? 'text-green-700 font-bold' : 'text-green-600 group-hover:text-green-700'}`}>
+                          {copiedId === g.id ? 'Copied!' : getBookingUrl(g.id)}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 );
@@ -383,7 +414,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">Welcome to Ground Booking!</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Welcome to Ground Booking!</h2>
             <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
               Get started by creating your first ground. Set your operating hours, pricing, and start accepting bookings from customers.
             </p>
@@ -406,16 +437,16 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 </svg>
               }
             >
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
                 <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-xl">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-blue-100 text-sm font-medium mb-1">Total Bookings</p>
-                        <p className="text-3xl font-bold">{totalBookings}</p>
+                        <p className="text-blue-100 text-xs sm:text-sm font-medium mb-1">Total Bookings</p>
+                        <p className="text-2xl sm:text-3xl font-bold">{totalBookings}</p>
                       </div>
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                       </div>
@@ -424,14 +455,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 </Card>
 
                 <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-xl">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-green-100 text-sm font-medium mb-1">Today's Bookings</p>
-                        <p className="text-3xl font-bold">{todayBookings}</p>
+                        <p className="text-green-100 text-xs sm:text-sm font-medium mb-1">Today's Bookings</p>
+                        <p className="text-2xl sm:text-3xl font-bold">{todayBookings}</p>
                       </div>
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
@@ -440,14 +471,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 </Card>
 
                 <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-xl">
-                  <CardContent className="p-6">
+                  <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-purple-100 text-sm font-medium mb-1">Total Revenue</p>
-                        <p className="text-3xl font-bold">Rs. {totalRevenue.toLocaleString()}</p>
+                        <p className="text-purple-100 text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
+                        <p className="text-2xl sm:text-3xl font-bold">Rs. {totalRevenue.toLocaleString()}</p>
                       </div>
-                      <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>

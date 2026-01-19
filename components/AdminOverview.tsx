@@ -9,7 +9,7 @@ export const AdminOverview: React.FC = () => {
     <div className="space-y-6">
       {/* Overall Statistics */}
       <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">Overall Statistics</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Overall Statistics</h2>
         <OverallStats />
       </div>
 

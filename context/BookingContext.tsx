@@ -30,7 +30,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     setCurrentGround(prev => {
       if (!prev && allGrounds.length > 0) {
         return allGrounds[0];
-      }
+    }
       return prev;
     });
   }, []);
@@ -46,9 +46,9 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
       // If deleted ground was current, set to first available or null
       setCurrentGround(prev => {
         if (prev?.id === id) {
-          const remainingGrounds = BookingService.getAllGrounds();
+        const remainingGrounds = BookingService.getAllGrounds();
           return remainingGrounds.length > 0 ? remainingGrounds[0] : null;
-        }
+      }
         return prev;
       });
       refreshGrounds();
