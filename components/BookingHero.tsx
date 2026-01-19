@@ -3,6 +3,7 @@
 import React from 'react';
 import { Ground } from '@/lib/types';
 import { formatTimeRange } from '@/lib/utils/dateUtils';
+import { getGroundTypeLabel, getGroundTypeColor } from '@/lib/utils/groundUtils';
 
 interface BookingHeroProps {
   ground: Ground;
@@ -24,9 +25,19 @@ export const BookingHero: React.FC<BookingHeroProps> = ({
         {/* Ground Name */}
         <div className="flex items-start justify-between mb-4 sm:mb-6">
           <div className="flex-1 pr-2">
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-1 sm:mb-2">
-              {ground.name}
-            </h1>
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900">
+                {ground.name}
+              </h1>
+              <span className={`px-3 py-1 rounded-full text-xs sm:text-sm font-semibold border ${getGroundTypeColor(ground.type || 'other')}`}>
+                {getGroundTypeLabel(ground.type || 'other')}
+              </span>
+            </div>
+            {ground.description && (
+              <p className="text-gray-600 text-sm sm:text-base mb-2">
+                {ground.description}
+              </p>
+            )}
             <p className="text-gray-600 text-xs sm:text-sm lg:text-base">
               Book your perfect time slot
             </p>

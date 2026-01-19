@@ -11,6 +11,7 @@ interface BookingContextType {
   setCurrentGround: (ground: Ground | null) => void;
   refreshBookings: () => void;
   refreshGrounds: () => void;
+  deleteGround: (id: string) => boolean;
 }
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
@@ -35,6 +36,20 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
     setBookings(allBookings);
   };
 
+  const deleteGround = (id: string): boolean => {
+    const success = BookingService.deleteGround(id);
+    if (success) {
+      // If deleted ground was current, set to first available or null
+      if (currentGround?.id === id) {
+        const remainingGrounds = BookingService.getAllGrounds();
+        setCurrentGround(remainingGrounds.length > 0 ? remainingGrounds[0] : null);
+      }
+      refreshGrounds();
+      return true;
+    }
+    return false;
+  };
+
   useEffect(() => {
     refreshGrounds();
     refreshBookings();
@@ -49,6 +64,7 @@ export const BookingProvider: React.FC<{ children: ReactNode }> = ({ children })
         setCurrentGround,
         refreshBookings,
         refreshGrounds,
+        deleteGround,
       }}
     >
       {children}

@@ -40,6 +40,16 @@ export class BookingService {
     return grounds[index];
   }
 
+  static deleteGround(id: string): boolean {
+    const grounds = StorageService.getGrounds();
+    const index = grounds.findIndex((g: Ground) => g.id === id);
+    if (index === -1) return false;
+
+    grounds.splice(index, 1);
+    StorageService.saveGrounds(grounds);
+    return true;
+  }
+
   // Booking operations
   static createBooking(bookingData: BookingFormData, groundId: string): Booking {
     const ground = this.getGround(groundId);
@@ -138,6 +148,69 @@ export class BookingService {
       }
     }
     return true;
+  }
+
+  // Aggregate statistics operations
+  static getTotalBookings(): number {
+    return this.getBookings().length;
+  }
+
+  static getTotalRevenue(): number {
+    const bookings = this.getBookings();
+    return bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  }
+
+  static getTodayTotalBookings(): number {
+    const today = new Date().toISOString().split('T')[0];
+    const bookings = this.getBookings();
+    return bookings.filter((b) => b.date === today).length;
+  }
+
+  static getRevenueByGround(): Array<{ groundId: string; groundName: string; revenue: number }> {
+    const bookings = this.getBookings();
+    const grounds = this.getAllGrounds();
+    const revenueMap = new Map<string, number>();
+
+    bookings.forEach((b) => {
+      const current = revenueMap.get(b.groundId) || 0;
+      revenueMap.set(b.groundId, current + b.totalPrice);
+    });
+
+    return Array.from(revenueMap.entries()).map(([groundId, revenue]) => {
+      const ground = grounds.find((g) => g.id === groundId);
+      return {
+        groundId,
+        groundName: ground?.name || 'Unknown Ground',
+        revenue,
+      };
+    });
+  }
+
+  static getBookingsByGround(): Array<{ groundId: string; groundName: string; count: number }> {
+    const bookings = this.getBookings();
+    const grounds = this.getAllGrounds();
+    const countMap = new Map<string, number>();
+
+    bookings.forEach((b) => {
+      const current = countMap.get(b.groundId) || 0;
+      countMap.set(b.groundId, current + 1);
+    });
+
+    return Array.from(countMap.entries()).map(([groundId, count]) => {
+      const ground = grounds.find((g) => g.id === groundId);
+      return {
+        groundId,
+        groundName: ground?.name || 'Unknown Ground',
+        count,
+      };
+    });
+  }
+
+  static getActiveGroundsCount(): number {
+    const grounds = this.getAllGrounds();
+    const bookings = this.getBookings();
+    const groundsWithBookings = new Set(bookings.map((b) => b.groundId));
+    return groundsWithBookings.size;
   }
 
   // Utility

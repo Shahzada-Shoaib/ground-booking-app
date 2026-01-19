@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import { Button } from './ui/Button';
 import { Input } from './ui/Input';
+import { getBookingUrl } from '@/lib/utils/urlUtils';
 
 interface ShareLinkProps {
   groundId: string;
@@ -15,9 +16,7 @@ export const ShareLink: React.FC<ShareLinkProps> = ({ groundId, groundName }) =>
   const [bookingUrl, setBookingUrl] = useState('');
   
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setBookingUrl(`${window.location.origin}/booking/${groundId}`);
-    }
+    setBookingUrl(getBookingUrl(groundId));
   }, [groundId]);
 
   const handleCopy = async () => {

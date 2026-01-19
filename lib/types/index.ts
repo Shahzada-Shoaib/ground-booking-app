@@ -1,7 +1,11 @@
+export type GroundType = 'cricket' | 'padel' | 'football' | 'tennis' | 'basketball' | 'badminton' | 'other';
+
 export interface Ground {
   id: string;
   name: string;
+  type: GroundType;
   ownerName: string;
+  description?: string;
   operatingHours: {
     start: number; // Hour in 24-hour format (e.g., 9 for 9 AM)
     end: number; // Hour in 24-hour format (e.g., 22 for 10 PM)
@@ -43,7 +47,9 @@ export interface BookingFormData {
 
 export interface GroundSettings {
   name: string;
+  type: GroundType;
   ownerName: string;
+  description?: string;
   startHour: number;
   endHour: number;
   pricePerHour: number;
