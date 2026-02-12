@@ -12,6 +12,7 @@ const bookingUpdateSchema = z.object({
   status: z.enum(['pending', 'confirmed', 'cancelled', 'completed']).optional(),
   cancellationReason: z.string().optional(),
   specialRequests: z.string().optional(),
+  rescheduledFrom: z.string().optional(),
 });
 
 // GET - Get single booking - Auth optional for development
@@ -164,17 +165,101 @@ export async function PATCH(
       }
 
       // Update booking with reschedule info
-      validatedData.rescheduledFrom = booking._id.toString();
+      // Create update object with rescheduledFrom
+      const updateData: any = {
+        ...validatedData,
+        rescheduledFrom: booking._id.toString(),
+      };
+
+      const updatedBooking = await Booking.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          id: updatedBooking!._id.toString(),
+          groundId: updatedBooking!.groundId,
+          userId: updatedBooking!.userId,
+          customerName: updatedBooking!.customerName,
+          customerPhone: updatedBooking!.customerPhone,
+          customerEmail: updatedBooking!.customerEmail,
+          date: updatedBooking!.date,
+          startTime: updatedBooking!.startTime,
+          endTime: updatedBooking!.endTime,
+          hours: updatedBooking!.hours,
+          totalPrice: updatedBooking!.totalPrice,
+          status: updatedBooking!.status,
+          type: updatedBooking!.type,
+          recurringPattern: updatedBooking!.recurringPattern,
+          parentBookingId: updatedBooking!.parentBookingId,
+          rescheduledFrom: updatedBooking!.rescheduledFrom,
+          cancellationReason: updatedBooking!.cancellationReason,
+          cancelledAt: updatedBooking!.cancelledAt?.toISOString(),
+          approvedBy: updatedBooking!.approvedBy,
+          approvedAt: updatedBooking!.approvedAt?.toISOString(),
+          waitlistPosition: updatedBooking!.waitlistPosition,
+          specialRequests: updatedBooking!.specialRequests,
+          discountCode: updatedBooking!.discountCode,
+          discountAmount: updatedBooking!.discountAmount,
+          createdAt: updatedBooking!.createdAt.toISOString(),
+          updatedAt: updatedBooking!.updatedAt.toISOString(),
+        },
+        message: 'Booking updated successfully',
+      });
     }
 
     // Handle cancellation
     if (validatedData.status === 'cancelled') {
-      validatedData.cancelledAt = new Date();
-      if (!validatedData.cancellationReason) {
-        validatedData.cancellationReason = 'Cancelled by user';
-      }
+      const updateData: any = {
+        ...validatedData,
+        cancelledAt: new Date(),
+        cancellationReason: validatedData.cancellationReason || 'Cancelled by user',
+      };
+
+      const updatedBooking = await Booking.findByIdAndUpdate(
+        id,
+        { $set: updateData },
+        { new: true, runValidators: true }
+      );
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          id: updatedBooking!._id.toString(),
+          groundId: updatedBooking!.groundId,
+          userId: updatedBooking!.userId,
+          customerName: updatedBooking!.customerName,
+          customerPhone: updatedBooking!.customerPhone,
+          customerEmail: updatedBooking!.customerEmail,
+          date: updatedBooking!.date,
+          startTime: updatedBooking!.startTime,
+          endTime: updatedBooking!.endTime,
+          hours: updatedBooking!.hours,
+          totalPrice: updatedBooking!.totalPrice,
+          status: updatedBooking!.status,
+          type: updatedBooking!.type,
+          recurringPattern: updatedBooking!.recurringPattern,
+          parentBookingId: updatedBooking!.parentBookingId,
+          rescheduledFrom: updatedBooking!.rescheduledFrom,
+          cancellationReason: updatedBooking!.cancellationReason,
+          cancelledAt: updatedBooking!.cancelledAt?.toISOString(),
+          approvedBy: updatedBooking!.approvedBy,
+          approvedAt: updatedBooking!.approvedAt?.toISOString(),
+          waitlistPosition: updatedBooking!.waitlistPosition,
+          specialRequests: updatedBooking!.specialRequests,
+          discountCode: updatedBooking!.discountCode,
+          discountAmount: updatedBooking!.discountAmount,
+          createdAt: updatedBooking!.createdAt.toISOString(),
+          updatedAt: updatedBooking!.updatedAt.toISOString(),
+        },
+        message: 'Booking updated successfully',
+      });
     }
 
+    // Regular update (no reschedule or cancellation)
     const updatedBooking = await Booking.findByIdAndUpdate(
       id,
       { $set: validatedData },
