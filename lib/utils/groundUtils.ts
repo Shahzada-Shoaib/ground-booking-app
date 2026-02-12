@@ -15,13 +15,13 @@ export const getGroundTypeLabel = (type: GroundType): string => {
 
 export const getGroundTypeColor = (type: GroundType): string => {
   const colors: Record<GroundType, string> = {
-    cricket: 'bg-green-100 text-green-800 border-green-300',
-    padel: 'bg-blue-100 text-blue-800 border-blue-300',
-    football: 'bg-purple-100 text-purple-800 border-purple-300',
-    tennis: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-    basketball: 'bg-orange-100 text-orange-800 border-orange-300',
-    badminton: 'bg-pink-100 text-pink-800 border-pink-300',
-    other: 'bg-gray-100 text-gray-800 border-gray-300',
+    cricket: 'bg-[var(--primary-100)] text-[var(--primary-800)] border-[var(--primary-300)] dark:bg-[var(--primary-900)] dark:text-[var(--primary-100)]',
+    padel: 'bg-[var(--accent-500)]/15 text-[var(--accent-600)] border-[var(--accent-500)]/30',
+    football: 'bg-[var(--primary-200)] text-[var(--primary-900)] border-[var(--primary-400)] dark:bg-[var(--primary-800)] dark:text-[var(--primary-200)]',
+    tennis: 'bg-[var(--warning)]/15 text-[var(--warning)] border-[var(--warning)]/30',
+    basketball: 'bg-[var(--danger)]/15 text-[var(--danger)] border-[var(--danger)]/30',
+    badminton: 'bg-[var(--success)]/15 text-[var(--success)] border-[var(--success)]/30',
+    other: 'bg-[var(--gray-100)] text-[var(--gray-800)] border-[var(--gray-300)] dark:bg-[var(--gray-800)] dark:text-[var(--gray-100)]',
   };
   return colors[type] || colors.other;
 };

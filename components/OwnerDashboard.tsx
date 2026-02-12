@@ -280,16 +280,16 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   return (
     <div className="space-y-6">
       {/* Grounds List */}
-      <Card className="shadow-xl border-2 border-green-100">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b border-green-100">
+      <Card className="shadow-xl border-2 border-[var(--primary-200)]" variant="elevated">
+        <CardHeader className="bg-[var(--primary-50)] border-b border-[var(--primary-200)]">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">All Grounds</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">Manage multiple grounds and their bookings</p>
+              <CardTitle className="text-2xl font-bold text-[var(--foreground)]">All Grounds</CardTitle>
+              <p className="text-sm text-[var(--muted-foreground)] mt-1">Manage multiple grounds and their bookings</p>
             </div>
             <Button
               onClick={handleAddNewGround}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-lg hover:shadow-xl font-semibold min-h-[44px]"
+              className="px-6 py-3 min-h-[44px]"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -301,16 +301,15 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
         <CardContent className="p-4 sm:p-6">
           {grounds.length === 0 ? (
             <div className="text-center py-8">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-[var(--primary-100)] rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Grounds Yet</h3>
-              <p className="text-gray-600 mb-4">Get started by creating your first ground</p>
+              <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">No Grounds Yet</h3>
+              <p className="text-[var(--muted-foreground)] mb-4">Get started by creating your first ground</p>
               <Button
                 onClick={handleAddNewGround}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-lg hover:shadow-xl font-semibold"
               >
                 Create Your First Ground
               </Button>
@@ -325,17 +324,17 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                     key={g.id}
                     className={`p-3 sm:p-4 rounded-xl border-2 transition-all cursor-pointer ${
                       isSelected
-                        ? 'border-green-500 bg-green-50 shadow-lg'
-                        : 'border-gray-200 bg-white hover:border-green-300 hover:shadow-md'
+                        ? 'border-[var(--primary-600)] bg-[var(--primary-50)] shadow-lg'
+                        : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--primary-300)] hover:shadow-md'
                     }`}
                     onClick={() => handleGroundSelect(g)}
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <h3 className="font-bold text-base sm:text-lg text-gray-900 truncate">{g.name}</h3>
+                          <h3 className="font-bold text-base sm:text-lg text-[var(--foreground)] truncate">{g.name}</h3>
                           {isSelected && (
-                            <span className="px-2 py-1 bg-green-600 text-white text-xs font-semibold rounded-full">
+                            <span className="px-2 py-1 bg-[var(--primary-600)] text-white text-xs font-semibold rounded-full">
                               Active
                             </span>
                           )}
@@ -349,7 +348,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                           e.stopPropagation();
                           handleDeleteGround(g);
                         }}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded-lg transition-colors"
                         title="Delete ground"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -358,26 +357,26 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                       </button>
                     </div>
                     {g.description && (
-                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">{g.description}</p>
+                      <p className="text-sm text-[var(--muted-foreground)] mb-3 line-clamp-2">{g.description}</p>
                     )}
                     <div className="grid grid-cols-2 gap-2 mb-3">
-                      <div className="text-center p-2 bg-blue-50 rounded-lg">
-                        <p className="text-xs text-gray-600">Bookings</p>
-                        <p className="text-lg font-bold text-blue-600">{stats.totalBookings}</p>
+                      <div className="text-center p-2 bg-[var(--primary-50)] rounded-lg">
+                        <p className="text-xs text-[var(--muted-foreground)]">Bookings</p>
+                        <p className="text-lg font-bold text-[var(--primary-600)]">{stats.totalBookings}</p>
                       </div>
-                      <div className="text-center p-2 bg-purple-50 rounded-lg">
-                        <p className="text-xs text-gray-600">Revenue</p>
-                        <p className="text-lg font-bold text-purple-600">Rs. {stats.totalRevenue.toLocaleString()}</p>
+                      <div className="text-center p-2 bg-[var(--primary-50)] rounded-lg">
+                        <p className="text-xs text-[var(--muted-foreground)]">Revenue</p>
+                        <p className="text-lg font-bold text-[var(--primary-600)]">Rs. {stats.totalRevenue.toLocaleString()}</p>
                       </div>
                     </div>
-                    <div className="pt-3 border-t border-gray-200">
-                      <p className="text-xs text-gray-500 mb-1">Booking Link:</p>
+                    <div className="pt-3 border-t border-[var(--border)]">
+                      <p className="text-xs text-[var(--muted-foreground)] mb-1">Booking Link:</p>
                       <div 
                         onClick={(e) => handleCopyLink(g.id, e)}
                         className="cursor-pointer group"
                         title="Click to copy booking link"
                       >
-                        <p className={`text-xs font-mono break-all overflow-hidden transition-colors ${copiedId === g.id ? 'text-green-700 font-bold' : 'text-green-600 group-hover:text-green-700'}`}>
+                        <p className={`text-xs font-mono break-all overflow-hidden transition-colors ${copiedId === g.id ? 'text-[var(--primary-700)] font-bold' : 'text-[var(--primary-600)] group-hover:text-[var(--primary-700)]'}`}>
                           {copiedId === g.id ? 'Copied!' : getBookingUrl(g.id)}
                         </p>
                       </div>
@@ -392,30 +391,30 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
 
       {/* Show welcome message if no ground selected and not adding new */}
       {!ground && !showAddGround && grounds.length > 0 && (
-        <Card className="shadow-xl border-2 border-blue-100 bg-gradient-to-br from-blue-50 to-white">
+        <Card className="shadow-xl border-2 border-[var(--primary-200)] bg-[var(--primary-50)]">
           <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-16 h-16 bg-[var(--primary-600)] rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Select a Ground</h2>
-            <p className="text-gray-600">Click on a ground above to view and manage its details</p>
+            <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">Select a Ground</h2>
+            <p className="text-[var(--muted-foreground)]">Click on a ground above to view and manage its details</p>
           </CardContent>
         </Card>
       )}
 
       {/* Show welcome message if no grounds exist */}
       {!ground && !showAddGround && grounds.length === 0 && (
-        <Card className="shadow-xl border-2 border-green-100 bg-gradient-to-br from-green-50 to-white">
+        <Card className="shadow-xl border-2 border-[var(--primary-200)] bg-[var(--primary-50)]">
           <CardContent className="p-12 text-center">
-            <div className="w-24 h-24 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="w-24 h-24 bg-[var(--primary-600)] rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg">
               <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Welcome to Ground Booking!</h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[var(--foreground)] mb-3">Welcome to Ground Booking!</h2>
+            <p className="text-lg text-[var(--muted-foreground)] mb-8 max-w-2xl mx-auto">
               Get started by creating your first ground. Set your operating hours, pricing, and start accepting bookings from customers.
             </p>
           </CardContent>
@@ -438,11 +437,11 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               }
             >
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-                <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-xl">
+                <Card className="bg-gradient-to-br from-[var(--primary-600)] to-[var(--primary-700)] text-white border-0 shadow-xl">
                   <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-blue-100 text-xs sm:text-sm font-medium mb-1">Total Bookings</p>
+                        <p className="text-white/80 text-xs sm:text-sm font-medium mb-1">Total Bookings</p>
                         <p className="text-2xl sm:text-3xl font-bold">{totalBookings}</p>
                       </div>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -454,11 +453,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-xl">
+                <Card className="bg-white border-2 border-[var(--primary-300)] shadow-xl">
                   <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-green-100 text-xs sm:text-sm font-medium mb-1">Today's Bookings</p>
+                        <p className="text-[var(--muted-foreground)] text-xs sm:text-sm font-medium mb-1">Today's Bookings</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">{todayBookings}</p>
                         <p className="text-2xl sm:text-3xl font-bold">{todayBookings}</p>
                       </div>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -470,11 +470,12 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   </CardContent>
                 </Card>
 
-                <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-xl">
+                <Card className="bg-white border-2 border-[var(--primary-400)] shadow-xl">
                   <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-purple-100 text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
+                        <p className="text-[var(--muted-foreground)] text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">Rs. {totalRevenue.toLocaleString()}</p>
                         <p className="text-2xl sm:text-3xl font-bold">Rs. {totalRevenue.toLocaleString()}</p>
                       </div>
                       <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -513,9 +514,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 />
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                     <span className="flex items-center gap-2">
-                      <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                       </svg>
                       Ground Type
@@ -524,7 +525,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   <select
                     value={settings.type}
                     onChange={(e) => setSettings({ ...settings, type: e.target.value as GroundType })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                    className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)]"
                   >
                     {GROUND_TYPES.map((type) => (
                       <option key={type} value={type}>
@@ -544,7 +545,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 />
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                     Description (Optional)
                   </label>
                   <textarea
@@ -552,7 +553,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                     onChange={(e) => setSettings({ ...settings, description: e.target.value })}
                     placeholder="Add a description for this ground..."
                     rows={3}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white resize-none"
+                    className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)] resize-none"
                   />
                 </div>
               </div>
@@ -561,7 +562,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Opening Hour
@@ -570,7 +571,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 <select
                   value={settings.startHour}
                   onChange={(e) => setSettings({ ...settings, startHour: parseInt(e.target.value) })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                  className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)]"
                 >
                   {hourOptions.map((hour) => (
                     <option key={hour} value={hour}>
@@ -583,7 +584,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[var(--danger)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Closing Hour
@@ -592,7 +593,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 <select
                   value={settings.endHour}
                   onChange={(e) => setSettings({ ...settings, endHour: parseInt(e.target.value) })}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                  className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)]"
                 >
                   {hourOptions.map((hour) => (
                     <option key={hour} value={hour}>
@@ -605,14 +606,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
                   <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     Price Per Hour
                   </span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">Rs.</span>
+                  <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--muted-foreground)] font-medium">Rs.</span>
                   <Input
                     type="number"
                     value={settings.pricePerHour}
@@ -627,8 +628,8 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
             </div>
 
             {ground && (
-              <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
-                <p className="text-sm text-blue-800">
+              <div className="p-4 bg-[var(--primary-50)] border-2 border-[var(--primary-200)] rounded-xl">
+                <p className="text-sm text-[var(--foreground)]">
                   <span className="font-semibold">Operating Hours:</span>{' '}
                   {formatTimeRange(settings.startHour, settings.endHour)}
                 </p>
@@ -648,7 +649,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   <Button
                     onClick={() => handleDeleteGround(ground)}
                     variant="outline"
-                    className="w-full sm:w-auto px-6 py-3 text-red-600 border-red-300 hover:bg-red-50 min-h-[44px]"
+                    className="w-full sm:w-auto px-6 py-3 min-h-[44px]"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -657,7 +658,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   </Button>
                 )}
                 {ground && (
-                  <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+                  <div className="text-xs sm:text-sm text-[var(--muted-foreground)] text-center sm:text-left">
                     Last updated: {new Date(ground.createdAt).toLocaleDateString()}
                   </div>
                 )}
@@ -700,36 +701,37 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
             >
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
                 <div>
-                  <p className="text-sm sm:text-base text-gray-600">View and manage all your ground bookings</p>
+                  <p className="text-sm sm:text-base text-[var(--muted-foreground)]">View and manage all your ground bookings</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {bookings.length > 0 && (
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={handleExportCSV}
-                    className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+                    size="sm"
                     title="Export to CSV"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     CSV
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={handleExportJSON}
-                    className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+                    size="sm"
+                    variant="secondary"
                     title="Export to JSON"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     JSON
-                  </button>
+                  </Button>
                 </div>
               )}
               <button
                 onClick={refreshBookings}
-                className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2 text-sm sm:text-base min-h-[44px]"
+                className="px-3 sm:px-4 py-2 min-h-[44px]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -740,14 +742,14 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           </div>
 
           {/* Tabs */}
-          <div className="mb-4 sm:mb-6 border-b border-gray-200 overflow-x-auto">
+          <div className="mb-4 sm:mb-6 border-b border-[var(--border)] overflow-x-auto">
             <div className="flex gap-2 min-w-max sm:min-w-0">
               <button
                 onClick={() => setActiveTab('list')}
                 className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all whitespace-nowrap min-h-[44px] ${
                   activeTab === 'list'
-                    ? 'text-green-600 border-b-2 border-green-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]'
+                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -761,8 +763,8 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 onClick={() => setActiveTab('calendar')}
                 className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all whitespace-nowrap min-h-[44px] ${
                   activeTab === 'calendar'
-                    ? 'text-green-600 border-b-2 border-green-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]'
+                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -776,8 +778,8 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 onClick={() => setActiveTab('analytics')}
                 className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all whitespace-nowrap min-h-[44px] ${
                   activeTab === 'analytics'
-                    ? 'text-green-600 border-b-2 border-green-600'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]'
+                    : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 }`}
               >
                 <span className="flex items-center gap-2">
@@ -858,7 +860,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           <p className="text-gray-700 mb-4">
             Are you sure you want to delete <strong>{groundToDelete?.name}</strong>? This action cannot be undone.
           </p>
-          <p className="text-sm text-red-600 mb-6">
+          <p className="text-sm text-[var(--danger)] mb-6">
             All bookings for this ground will be preserved, but the ground will no longer be accessible.
           </p>
           <div className="flex gap-3 justify-end">
@@ -874,7 +876,8 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
             </Button>
             <Button
               onClick={confirmDelete}
-              className="px-6 py-2 bg-red-600 text-white hover:bg-red-700"
+              variant="danger"
+              className="px-6 py-2"
             >
               Delete
             </Button>

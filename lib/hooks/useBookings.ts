@@ -7,11 +7,11 @@ export const useBookings = (groundId?: string) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const refreshBookings = useCallback(() => {
+  const refreshBookings = useCallback(async () => {
     try {
       setIsLoading(true);
       setError(null);
-      const allBookings = BookingService.getBookings(groundId);
+      const allBookings = await BookingService.getBookings(groundId);
       setBookings(allBookings);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load bookings');
@@ -22,13 +22,13 @@ export const useBookings = (groundId?: string) => {
 
   useEffect(() => {
     refreshBookings();
-  }, [groundId, refreshBookings]);
+  }, [refreshBookings]);
 
-  const cancelBooking = (bookingId: string) => {
+  const cancelBooking = async (bookingId: string) => {
     try {
-      const cancelled = BookingService.cancelBooking(bookingId);
+      const cancelled = await BookingService.cancelBooking(bookingId);
       if (cancelled) {
-        refreshBookings();
+        await refreshBookings();
         return true;
       }
       return false;

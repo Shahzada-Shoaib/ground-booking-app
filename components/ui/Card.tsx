@@ -4,23 +4,31 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   padding?: 'none' | 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'bordered' | 'elevated';
 }
 
 export const Card: React.FC<CardProps> = ({
   children,
   className = '',
   padding = 'md',
+  variant = 'default',
 }) => {
   const paddingClasses = {
     none: '',
-    sm: 'p-3 sm:p-4',
-    md: 'p-4 sm:p-6',
-    lg: 'p-6 sm:p-8',
+    sm: 'p-2 sm:p-3',
+    md: 'p-3 sm:p-4 md:p-6',
+    lg: 'p-4 sm:p-6 md:p-8',
+  };
+
+  const variantClasses = {
+    default: 'bg-[var(--card)] border border-[var(--border)]',
+    bordered: 'bg-transparent border-2 border-[var(--border)]',
+    elevated: 'bg-[var(--card)] shadow-lg shadow-black/5 dark:shadow-black/20',
   };
 
   return (
     <div
-      className={`bg-white rounded-lg sm:rounded-xl shadow-md border border-gray-200 ${paddingClasses[padding]} ${className}`}
+      className={`rounded-xl transition-all duration-200 ${variantClasses[variant]} ${paddingClasses[padding]} ${className}`}
     >
       {children}
     </div>
@@ -37,7 +45,7 @@ export const CardHeader: React.FC<CardHeaderProps> = ({
   className = '',
 }) => {
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className={`p-3 sm:p-4 md:p-6 pb-0 ${className}`}>
       {children}
     </div>
   );
@@ -53,7 +61,7 @@ export const CardTitle: React.FC<CardTitleProps> = ({
   className = '',
 }) => {
   return (
-    <h3 className={`text-xl font-semibold text-gray-900 ${className}`}>
+    <h3 className={`text-xl font-semibold text-[var(--card-foreground)] ${className}`}>
       {children}
     </h3>
   );
@@ -68,5 +76,5 @@ export const CardContent: React.FC<CardContentProps> = ({
   children,
   className = '',
 }) => {
-  return <div className={className}>{children}</div>;
+  return <div className={`p-3 sm:p-4 md:p-6 ${className}`}>{children}</div>;
 };

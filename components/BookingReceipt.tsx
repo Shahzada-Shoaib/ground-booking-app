@@ -81,7 +81,7 @@ export const BookingReceipt: React.FC<BookingReceiptProps> = ({
             </div>
             <div className="pt-3 border-t border-gray-300 flex justify-between items-center">
               <span className="text-lg font-bold text-gray-900">Total Amount</span>
-              <span className="text-2xl font-bold text-green-600">Rs. {booking.totalPrice.toLocaleString()}</span>
+              <span className="text-2xl font-bold text-[var(--primary-600)]">Rs. {booking.totalPrice.toLocaleString()}</span>
             </div>
           </div>
 

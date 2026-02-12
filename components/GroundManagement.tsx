@@ -38,6 +38,11 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
     startHour: ground.operatingHours.start,
     endHour: ground.operatingHours.end,
     pricePerHour: ground.pricePerHour,
+    location: ground.location || {
+      address: '',
+      city: '',
+      mapLink: '',
+    },
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -69,13 +74,18 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
       startHour: ground.operatingHours.start,
       endHour: ground.operatingHours.end,
       pricePerHour: ground.pricePerHour,
+      location: ground.location || {
+        address: '',
+        city: '',
+        mapLink: '',
+      },
     });
   }, [ground]);
 
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const updated = BookingService.updateGround(ground.id, {
+      const updated = await BookingService.updateGround(ground.id, {
         name: settings.name,
         type: settings.type,
         ownerName: settings.ownerName,
@@ -85,15 +95,16 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
           end: settings.endHour,
         },
         pricePerHour: settings.pricePerHour,
+        location: settings.location,
       });
       if (updated) {
-        refreshGrounds();
+        await refreshGrounds();
         showSuccess('Settings saved successfully!');
       } else {
         showError('Failed to update settings. Please try again.');
       }
-    } catch (error) {
-      showError('Failed to update settings. Please try again.');
+    } catch (error: any) {
+      showError(error.message || 'Failed to update settings. Please try again.');
     } finally {
       setIsSaving(false);
     }
@@ -151,27 +162,27 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
   return (
     <div className="space-y-4">
       {/* Stats Cards Section - Always Visible */}
-      <Card className="shadow-xl border-2 border-green-100">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b border-green-100">
+      <Card className="shadow-xl border-2 border-[var(--primary-200)]" variant="elevated">
+        <CardHeader className="bg-[var(--primary-50)] border-b border-[var(--primary-200)]">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-[var(--primary-600)] rounded-xl flex items-center justify-center shadow-lg">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">Statistics & Overview</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">Ground performance and booking statistics</p>
+              <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Statistics & Overview</CardTitle>
+              <p className="text-sm text-[var(--muted-foreground)] mt-1">Ground performance and booking statistics</p>
             </div>
           </div>
         </CardHeader>
         <CardContent className="p-4 sm:p-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-xl">
+          <Card className="bg-gradient-to-br from-[var(--primary-600)] to-[var(--primary-700)] text-white border-0 shadow-xl">
             <CardContent className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-blue-100 text-xs sm:text-sm font-medium mb-1">Total Bookings</p>
+                  <p className="text-white/80 text-xs sm:text-sm font-medium mb-1">Total Bookings</p>
                   <p className="text-2xl sm:text-3xl font-bold">{totalBookings}</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -183,12 +194,12 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-xl">
+          <Card className="bg-white border-2 border-[var(--primary-300)] shadow-xl">
             <CardContent className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-green-100 text-xs sm:text-sm font-medium mb-1">Today's Bookings</p>
-                  <p className="text-2xl sm:text-3xl font-bold">{todayBookings}</p>
+                  <p className="text-[var(--muted-foreground)] text-xs sm:text-sm font-medium mb-1">Today's Bookings</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">{todayBookings}</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,12 +210,12 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-xl">
+          <Card className="bg-white border-2 border-[var(--primary-400)] shadow-xl">
             <CardContent className="p-4 sm:p-5 lg:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-purple-100 text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
-                  <p className="text-2xl sm:text-3xl font-bold">Rs. {totalRevenue.toLocaleString()}</p>
+                  <p className="text-[var(--muted-foreground)] text-xs sm:text-sm font-medium mb-1">Total Revenue</p>
+                  <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">Rs. {totalRevenue.toLocaleString()}</p>
                 </div>
                 <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
                   <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -242,9 +253,9 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             />
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                 <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
                   </svg>
                   Ground Type
@@ -253,7 +264,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
               <select
                 value={settings.type}
                 onChange={(e) => setSettings({ ...settings, type: e.target.value as GroundType })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)]"
               >
                 {GROUND_TYPES.map((type) => (
                   <option key={type} value={type}>
@@ -273,7 +284,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             />
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                 Description (Optional)
               </label>
               <textarea
@@ -281,16 +292,75 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
                 onChange={(e) => setSettings({ ...settings, description: e.target.value })}
                 placeholder="Add a description for this ground..."
                 rows={3}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white resize-none"
+                className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)] resize-none"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  Address (Optional)
+                </span>
+              </label>
+              <Input
+                type="text"
+                value={settings.location?.address || ''}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  location: { ...settings.location, address: e.target.value }
+                })}
+                placeholder="e.g., Street 123, Area Name"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
+                City (Optional)
+              </label>
+              <Input
+                type="text"
+                value={settings.location?.city || ''}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  location: { ...settings.location, city: e.target.value }
+                })}
+                placeholder="e.g., Karachi, Lahore"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  </svg>
+                  Map Link (Optional)
+                </span>
+              </label>
+              <Input
+                type="url"
+                value={settings.location?.mapLink || ''}
+                onChange={(e) => setSettings({ 
+                  ...settings, 
+                  location: { ...settings.location, mapLink: e.target.value }
+                })}
+                placeholder="https://maps.google.com/..."
+              />
+              <p className="text-xs text-[var(--muted-foreground)] mt-1">
+                Paste Google Maps link or any map service URL
+              </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                 <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Opening Hour
@@ -299,7 +369,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
               <select
                 value={settings.startHour}
                 onChange={(e) => setSettings({ ...settings, startHour: parseInt(e.target.value) })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)]"
               >
                 {hourOptions.map((hour) => (
                   <option key={hour} value={hour}>
@@ -310,9 +380,9 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                 <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[var(--danger)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Closing Hour
@@ -321,7 +391,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
               <select
                 value={settings.endHour}
                 onChange={(e) => setSettings({ ...settings, endHour: parseInt(e.target.value) })}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all bg-white"
+                className="w-full px-4 py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)]"
               >
                 {hourOptions.map((hour) => (
                   <option key={hour} value={hour}>
@@ -332,16 +402,16 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                 <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   Price Per Hour
                 </span>
               </label>
               <div className="relative">
-                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">Rs.</span>
+                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[var(--muted-foreground)] font-medium">Rs.</span>
                 <Input
                   type="number"
                   value={settings.pricePerHour}
@@ -355,8 +425,8 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </div>
           </div>
 
-          <div className="p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
-            <p className="text-sm text-blue-800">
+          <div className="p-4 bg-[var(--primary-50)] border-2 border-[var(--primary-200)] rounded-xl">
+            <p className="text-sm text-[var(--foreground)]">
               <span className="font-semibold">Operating Hours:</span>{' '}
               {formatTimeRange(settings.startHour, settings.endHour)}
             </p>
@@ -373,15 +443,15 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </Button>
             <Button
               onClick={handleDeleteGround}
-              variant="outline"
-              className="w-full sm:w-auto px-6 py-3 text-red-600 border-red-300 hover:bg-red-50 min-h-[44px]"
+              variant="danger"
+              className="w-full sm:w-auto px-6 py-3 min-h-[44px]"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
               </svg>
               Delete Ground
             </Button>
-            <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
+            <div className="text-xs sm:text-sm text-[var(--muted-foreground)] text-center sm:text-left">
               Last updated: {new Date(ground.createdAt).toLocaleDateString()}
             </div>
           </div>
@@ -408,17 +478,17 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
       )}
 
       {/* Bookings Management Section - Always Visible */}
-      <Card className="shadow-xl border-2 border-green-100">
-        <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b border-green-100">
+      <Card className="shadow-xl border-2 border-[var(--primary-200)]" variant="elevated">
+        <CardHeader className="bg-[var(--primary-50)] border-b border-[var(--primary-200)]">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-[var(--primary-600)] rounded-xl flex items-center justify-center shadow-lg">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">Bookings Management</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">View and manage all your ground bookings</p>
+              <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Bookings Management</CardTitle>
+              <p className="text-sm text-[var(--muted-foreground)] mt-1">View and manage all your ground bookings</p>
             </div>
           </div>
         </CardHeader>
@@ -427,49 +497,50 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
               {bookings.length > 0 && (
                 <div className="flex gap-2">
-                  <button
+                  <Button
                     onClick={handleExportCSV}
-                    className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+                    size="sm"
                     title="Export to CSV"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     CSV
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     onClick={handleExportJSON}
-                    className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2 text-xs sm:text-sm min-h-[44px]"
+                    size="sm"
+                    variant="secondary"
                     title="Export to JSON"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                     JSON
-                  </button>
+                  </Button>
                 </div>
               )}
-              <button
+              <Button
                 onClick={refreshBookings}
-                className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center gap-2 text-sm sm:text-base min-h-[44px]"
+                size="sm"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 Refresh
-              </button>
+              </Button>
             </div>
           </div>
 
         {/* Tabs */}
-        <div className="mb-4 sm:mb-6 border-b border-gray-200 overflow-x-auto">
+        <div className="mb-4 sm:mb-6 border-b border-[var(--border)] overflow-x-auto">
           <div className="flex gap-2 min-w-max sm:min-w-0">
             <button
               onClick={() => setActiveTab('list')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all whitespace-nowrap min-h-[44px] ${
                 activeTab === 'list'
-                  ? 'text-green-600 border-b-2 border-green-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]'
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -483,8 +554,8 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
               onClick={() => setActiveTab('calendar')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all whitespace-nowrap min-h-[44px] ${
                 activeTab === 'calendar'
-                  ? 'text-green-600 border-b-2 border-green-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]'
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -498,8 +569,8 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
               onClick={() => setActiveTab('analytics')}
               className={`px-4 sm:px-6 py-2 sm:py-3 font-semibold transition-all whitespace-nowrap min-h-[44px] ${
                 activeTab === 'analytics'
-                  ? 'text-green-600 border-b-2 border-green-600'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? 'text-[var(--primary-600)] border-b-2 border-[var(--primary-600)]'
+                  : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
               }`}
             >
               <span className="flex items-center gap-2">
@@ -565,10 +636,10 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
         title="Delete Ground"
       >
         <div className="p-6">
-          <p className="text-gray-700 mb-4">
+          <p className="text-[var(--foreground)] mb-4">
             Are you sure you want to delete <strong>{ground.name}</strong>? This action cannot be undone.
           </p>
-          <p className="text-sm text-red-600 mb-6">
+          <p className="text-sm text-[var(--danger)] mb-6">
             All bookings for this ground will be preserved, but the ground will no longer be accessible.
           </p>
           <div className="flex gap-3 justify-end">
@@ -581,7 +652,8 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </Button>
             <Button
               onClick={confirmDelete}
-              className="px-6 py-2 bg-red-600 text-white hover:bg-red-700"
+              variant="danger"
+              className="px-6 py-2"
             >
               Delete
             </Button>

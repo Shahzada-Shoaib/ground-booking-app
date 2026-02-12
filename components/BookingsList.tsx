@@ -88,12 +88,12 @@ export const BookingsList: React.FC<BookingsListProps> = ({
 
   if (bookings.length === 0) {
     return (
-      <Card className="shadow-lg border-2 border-gray-200">
+      <Card className="shadow-lg border-2 border-[var(--border)]">
         <CardContent>
           <div className="text-center py-16">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-20 h-20 bg-[var(--muted)] rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
-                className="w-10 h-10 text-gray-400"
+                className="w-10 h-10 text-[var(--muted-foreground)]"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -106,8 +106,8 @@ export const BookingsList: React.FC<BookingsListProps> = ({
                 />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Bookings Yet</h3>
-            <p className="text-gray-500">
+            <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">No Bookings Yet</h3>
+            <p className="text-[var(--muted-foreground)]">
               When customers book your ground, they'll appear here.
             </p>
           </div>
@@ -119,14 +119,14 @@ export const BookingsList: React.FC<BookingsListProps> = ({
   return (
     <>
       {/* Search and Filter Section */}
-      <Card className="shadow-lg border-2 border-gray-100 mb-4 sm:mb-6">
+      <Card className="shadow-lg border-2 border-[var(--border)] mb-4 sm:mb-6">
         <CardContent className="p-4 sm:p-6">
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                   <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                     Search Bookings
@@ -140,9 +140,9 @@ export const BookingsList: React.FC<BookingsListProps> = ({
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-[var(--foreground)] mb-2">
                   <span className="flex items-center gap-2">
-                    <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     Filter by Date
@@ -156,10 +156,10 @@ export const BookingsList: React.FC<BookingsListProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-between pt-2 border-t border-gray-200">
-              <p className="text-sm font-medium text-gray-600">
-                Showing <span className="font-bold text-gray-900">{filteredBookings.length}</span> of{' '}
-                <span className="font-bold text-gray-900">{bookings.length}</span> booking{bookings.length !== 1 ? 's' : ''}
+            <div className="flex items-center justify-between pt-2 border-t border-[var(--border)]">
+              <p className="text-sm font-medium text-[var(--muted-foreground)]">
+                Showing <span className="font-bold text-[var(--foreground)]">{filteredBookings.length}</span> of{' '}
+                <span className="font-bold text-[var(--foreground)]">{bookings.length}</span> booking{bookings.length !== 1 ? 's' : ''}
               </p>
               <div className="flex items-center gap-3">
                 {filterDate && (
@@ -168,12 +168,12 @@ export const BookingsList: React.FC<BookingsListProps> = ({
                       setFilterDate('');
                       if (onDateFilter) onDateFilter('');
                     }}
-                    className="text-sm text-green-600 hover:text-green-700 font-medium"
+                    className="text-sm text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
                   >
                     Clear Date Filter
                   </button>
                 )}
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-[var(--muted-foreground)]">
                   {upcomingBookings.length} upcoming
                 </div>
               </div>
@@ -186,10 +186,10 @@ export const BookingsList: React.FC<BookingsListProps> = ({
       {filteredBookings.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {filteredBookings.map((booking) => (
-            <Card key={booking.id} className="shadow-lg hover:shadow-xl transition-shadow border-2 border-gray-100 overflow-hidden">
+            <Card key={booking.id} className="shadow-lg hover:shadow-xl transition-shadow border-2 border-[var(--border)] overflow-hidden">
               <CardContent className="p-0">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-green-500 to-green-600 p-4 text-white">
+                <div className="bg-gradient-to-r from-[var(--primary-600)] to-[var(--primary-700)] p-4 text-white">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
@@ -199,7 +199,7 @@ export const BookingsList: React.FC<BookingsListProps> = ({
                       </div>
                       <div>
                         <h3 className="font-bold text-lg">{booking.customerName}</h3>
-                        <p className="text-green-100 text-xs">Booking ID: {booking.id.slice(0, 8)}</p>
+                        <p className="text-white/80 text-xs">Booking ID: {booking.id.slice(0, 8)}</p>
                       </div>
                     </div>
                   </div>
@@ -210,52 +210,52 @@ export const BookingsList: React.FC<BookingsListProps> = ({
                   {/* Date & Time */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-8 h-8 bg-[var(--primary-100)] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Date</p>
-                        <p className="font-semibold text-gray-900">{formatDateShort(booking.date)}</p>
+                        <p className="text-xs text-[var(--muted-foreground)]">Date</p>
+                        <p className="font-semibold text-[var(--foreground)]">{formatDateShort(booking.date)}</p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 text-sm">
-                      <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div className="w-8 h-8 bg-[var(--primary-100)] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                       </div>
                       <div>
-                        <p className="text-xs text-gray-500">Time</p>
-                        <p className="font-semibold text-gray-900">{formatTimeRange(booking.startTime, booking.endTime)}</p>
-                        <p className="text-xs text-gray-500">{booking.hours} hour{booking.hours !== 1 ? 's' : ''}</p>
+                        <p className="text-xs text-[var(--muted-foreground)]">Time</p>
+                        <p className="font-semibold text-[var(--foreground)]">{formatTimeRange(booking.startTime, booking.endTime)}</p>
+                        <p className="text-xs text-[var(--muted-foreground)]">{booking.hours} hour{booking.hours !== 1 ? 's' : ''}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* Contact Info */}
-                  <div className="pt-3 border-t border-gray-200 space-y-2">
+                  <div className="pt-3 border-t border-[var(--border)] space-y-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
-                      <span className="text-gray-600">{booking.customerPhone}</span>
+                      <span className="text-[var(--foreground)]">{booking.customerPhone}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-[var(--muted-foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
-                      <span className="text-gray-600 truncate">{booking.customerEmail}</span>
+                      <span className="text-[var(--foreground)] truncate">{booking.customerEmail}</span>
                     </div>
                   </div>
 
                   {/* Price */}
-                  <div className="pt-3 border-t-2 border-gray-200">
+                  <div className="pt-3 border-t-2 border-[var(--border)]">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-600">Total Amount</span>
-                      <span className="text-2xl font-bold text-green-600">Rs. {booking.totalPrice.toLocaleString()}</span>
+                      <span className="text-sm font-medium text-[var(--muted-foreground)]">Total Amount</span>
+                      <span className="text-2xl font-bold text-[var(--primary-600)]">Rs. {booking.totalPrice.toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -294,22 +294,22 @@ export const BookingsList: React.FC<BookingsListProps> = ({
           ))}
         </div>
       ) : (
-        <Card className="shadow-lg border-2 border-gray-200">
+        <Card className="shadow-lg border-2 border-[var(--border)]">
           <CardContent>
             <div className="text-center py-12">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-16 h-16 bg-[var(--warning)]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-[var(--warning)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Results Found</h3>
-              <p className="text-gray-500 mb-4">No bookings match your search criteria.</p>
+              <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">No Results Found</h3>
+              <p className="text-[var(--muted-foreground)] mb-4">No bookings match your search criteria.</p>
               <button
                 onClick={() => {
                   setSearchTerm('');
                   setFilterDate('');
                 }}
-                className="text-sm text-green-600 hover:text-green-700 font-medium"
+                className="text-sm text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
               >
                 Clear all filters
               </button>
@@ -327,19 +327,19 @@ export const BookingsList: React.FC<BookingsListProps> = ({
       >
         <div className="space-y-6">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-[var(--danger)]/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-8 h-8 text-[var(--danger)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 mb-1">Confirm Cancellation</h3>
-              <p className="text-gray-600">
+              <h3 className="text-lg font-bold text-[var(--foreground)] mb-1">Confirm Cancellation</h3>
+              <p className="text-[var(--foreground)]">
                 Are you sure you want to cancel this booking? This action cannot be undone.
               </p>
             </div>
           </div>
-          <div className="flex gap-3 justify-end pt-4 border-t border-gray-200">
+          <div className="flex gap-3 justify-end pt-4 border-t border-[var(--border)]">
             <Button
               variant="outline"
               onClick={() => setCancelBookingId(null)}

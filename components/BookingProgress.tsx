@@ -20,9 +20,9 @@ export const BookingProgress: React.FC<BookingProgressProps> = ({
     <div className="w-full">
       <div className="flex items-center justify-between relative">
         {/* Progress Line */}
-        <div className="absolute top-5 left-0 right-0 h-0.5 bg-gray-200 -z-10">
+        <div className="absolute top-5 left-0 right-0 h-0.5 bg-[var(--gray-200)] -z-10">
           <div
-            className="h-full bg-green-600 transition-all duration-500 ease-out"
+            className="h-full bg-[var(--primary-600)] transition-all duration-500 ease-out"
             style={{
               width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
             }}
@@ -44,10 +44,10 @@ export const BookingProgress: React.FC<BookingProgressProps> = ({
                   text-lg sm:text-xl font-semibold transition-all duration-300
                   ${
                     isCompleted
-                      ? 'bg-green-600 text-white shadow-lg scale-110'
+                      ? 'bg-[var(--primary-600)] text-white shadow-lg scale-110'
                       : isActive
-                      ? 'bg-green-600 text-white shadow-lg ring-4 ring-green-200 scale-110'
-                      : 'bg-gray-200 text-gray-400'
+                      ? 'bg-[var(--primary-600)] text-white shadow-lg ring-4 ring-[var(--primary-200)] scale-110'
+                      : 'bg-[var(--gray-200)] text-[var(--muted-foreground)]'
                   }
                 `}
               >
@@ -67,8 +67,8 @@ export const BookingProgress: React.FC<BookingProgressProps> = ({
                     text-xs sm:text-sm font-medium
                     ${
                       isCompleted || isActive
-                        ? 'text-green-600'
-                        : 'text-gray-400'
+                        ? 'text-[var(--primary-600)]'
+                        : 'text-[var(--muted-foreground)]'
                     }
                   `}
                 >

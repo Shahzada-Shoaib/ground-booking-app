@@ -24,28 +24,28 @@ export const Input: React.FC<InputProps> = ({
       {label && (
         <label
           htmlFor={inputId}
-          className="block text-sm font-medium text-gray-700 mb-1"
+          className="block text-sm font-medium text-[var(--foreground)] mb-1"
         >
           {label}
-          {props.required && <span className="text-red-500 ml-1">*</span>}
+          {props.required && <span className="text-[var(--danger)] ml-1">*</span>}
         </label>
       )}
       <input
         id={inputId}
-        className={`w-full px-4 py-3 sm:py-2.5 text-base sm:text-sm border rounded-lg focus:outline-none focus:ring-2 transition-colors min-h-[44px] ${
+        className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm sm:text-base border rounded-lg focus:outline-none focus:ring-2 transition-colors min-h-[44px] bg-[var(--input)] text-[var(--foreground)] border-[var(--border)] focus:ring-[var(--ring)] focus:border-[var(--ring)] ${
           error
-            ? 'border-red-500 focus:ring-red-500'
-            : 'border-gray-300 focus:ring-green-500 focus:border-green-500'
+            ? 'border-[var(--danger)] focus:ring-[var(--danger)]'
+            : ''
         } ${className}`}
         {...props}
       />
       {error && (
-        <p className="mt-1 text-sm text-red-600" role="alert">
+        <p className="mt-1 text-sm text-[var(--danger)]" role="alert">
           {error}
         </p>
       )}
       {helperText && !error && (
-        <p className="mt-1 text-sm text-gray-500">{helperText}</p>
+        <p className="mt-1 text-sm text-[var(--muted-foreground)]">{helperText}</p>
       )}
     </div>
   );

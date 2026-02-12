@@ -1,216 +1,285 @@
 import { Ground, Booking, TimeSlot, BookingFormData } from '@/lib/types';
-import { StorageService } from './storageService';
+import apiService from '@/lib/utils/apiService';
 
 /**
- * Booking Service - Data abstraction layer
- * All data operations go through this service
- * Easy to replace with API calls/database later
+ * Booking Service - MongoDB API integration
+ * All data operations go through API calls to MongoDB
  */
 
 export class BookingService {
   // Ground operations
-  static getGround(id: string): Ground | null {
-    const grounds = StorageService.getGrounds();
-    return grounds.find((g: Ground) => g.id === id) || null;
+  static async getGround(id: string): Promise<Ground | null> {
+    try {
+      const response = await apiService.get<Ground>(`/grounds/${id}`);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Get ground error:', error);
+      return null;
+    }
   }
 
-  static getAllGrounds(): Ground[] {
-    return StorageService.getGrounds();
+  static async getAllGrounds(): Promise<Ground[]> {
+    try {
+      const response = await apiService.get<Ground[]>('/grounds');
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Get all grounds error:', error);
+      return [];
+    }
   }
 
-  static createGround(ground: Omit<Ground, 'id' | 'createdAt'>): Ground {
-    const grounds = StorageService.getGrounds();
-    const newGround: Ground = {
-      ...ground,
-      id: this.generateId(),
-      createdAt: new Date().toISOString(),
-    };
-    grounds.push(newGround);
-    StorageService.saveGrounds(grounds);
-    return newGround;
+  static async createGround(ground: Omit<Ground, 'id' | 'createdAt'>): Promise<Ground | null> {
+    try {
+      const response = await apiService.post<Ground>('/grounds', ground);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error || 'Failed to create ground');
+    } catch (error: any) {
+      console.error('Create ground error:', error);
+      throw error;
+    }
   }
 
-  static updateGround(id: string, updates: Partial<Ground>): Ground | null {
-    const grounds = StorageService.getGrounds();
-    const index = grounds.findIndex((g: Ground) => g.id === id);
-    if (index === -1) return null;
-
-    grounds[index] = { ...grounds[index], ...updates };
-    StorageService.saveGrounds(grounds);
-    return grounds[index];
+  static async updateGround(id: string, updates: Partial<Ground>): Promise<Ground | null> {
+    try {
+      const response = await apiService.put<Ground>(`/grounds/${id}`, updates);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Update ground error:', error);
+      return null;
+    }
   }
 
-  static deleteGround(id: string): boolean {
-    const grounds = StorageService.getGrounds();
-    const index = grounds.findIndex((g: Ground) => g.id === id);
-    if (index === -1) return false;
-
-    grounds.splice(index, 1);
-    StorageService.saveGrounds(grounds);
-    return true;
+  static async deleteGround(id: string): Promise<boolean> {
+    try {
+      const response = await apiService.delete(`/grounds/${id}`);
+      return response.success;
+    } catch (error) {
+      console.error('Delete ground error:', error);
+      return false;
+    }
   }
 
   // Booking operations
-  static createBooking(bookingData: BookingFormData, groundId: string): Booking {
-    const ground = this.getGround(groundId);
-    if (!ground) {
-      throw new Error('Ground not found');
+  static async createBooking(bookingData: BookingFormData, groundId: string): Promise<Booking | Booking[]> {
+    try {
+      const response = await apiService.post<Booking | Booking[]>('/bookings', {
+        ...bookingData,
+        groundId,
+        type: 'single',
+      });
+      
+      if (response.success && response.data) {
+        // Handle both single and array responses (for recurring bookings)
+        return Array.isArray(response.data) ? response.data : [response.data];
+      }
+      throw new Error(response.error || 'Failed to create booking');
+    } catch (error: any) {
+      console.error('Create booking error:', error);
+      throw error;
     }
-
-    const hours = bookingData.endTime - bookingData.startTime;
-    const totalPrice = hours * ground.pricePerHour;
-
-    const booking: Booking = {
-      id: this.generateId(),
-      groundId,
-      customerName: bookingData.customerName,
-      customerPhone: bookingData.customerPhone,
-      customerEmail: bookingData.customerEmail,
-      date: bookingData.date,
-      startTime: bookingData.startTime,
-      endTime: bookingData.endTime,
-      hours,
-      totalPrice,
-      status: 'confirmed',
-      createdAt: new Date().toISOString(),
-    };
-
-    const bookings = StorageService.getBookings();
-    bookings.push(booking);
-    StorageService.saveBookings(bookings);
-
-    return booking;
   }
 
-  static getBookings(groundId?: string): Booking[] {
-    const bookings = StorageService.getBookings();
-    if (groundId) {
-      return bookings.filter((b: Booking) => b.groundId === groundId && b.status === 'confirmed');
+  static async getBookings(groundId?: string): Promise<Booking[]> {
+    try {
+      const params = groundId ? `?groundId=${groundId}` : '';
+      const response = await apiService.get<Booking[]>(`/bookings${params}`);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Get bookings error:', error);
+      return [];
     }
-    return bookings.filter((b: Booking) => b.status === 'confirmed');
   }
 
-  static getBooking(id: string): Booking | null {
-    const bookings = StorageService.getBookings();
-    return bookings.find((b: Booking) => b.id === id) || null;
+  static async getBooking(id: string): Promise<Booking | null> {
+    try {
+      const response = await apiService.get<Booking>(`/bookings/${id}`);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Get booking error:', error);
+      return null;
+    }
   }
 
-  static cancelBooking(id: string): Booking | null {
-    const bookings = StorageService.getBookings();
-    const index = bookings.findIndex((b: Booking) => b.id === id);
-    if (index === -1) return null;
+  static async cancelBooking(id: string): Promise<Booking | null> {
+    try {
+      const response = await apiService.delete<{ id: string; status: string; cancelledAt: string }>(`/bookings/${id}`);
+      if (response.success && response.data) {
+        // Fetch updated booking
+        return this.getBooking(id);
+      }
+      return null;
+    } catch (error) {
+      console.error('Cancel booking error:', error);
+      return null;
+    }
+  }
 
-    bookings[index] = { ...bookings[index], status: 'cancelled' };
-    StorageService.saveBookings(bookings);
-    return bookings[index];
+  static async rescheduleBooking(
+    id: string,
+    newDate: string,
+    newStartTime: number,
+    newEndTime: number
+  ): Promise<Booking | null> {
+    try {
+      const response = await apiService.patch<Booking>(`/bookings/${id}`, {
+        date: newDate,
+        startTime: newStartTime,
+        endTime: newEndTime,
+      });
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return null;
+    } catch (error) {
+      console.error('Reschedule booking error:', error);
+      return null;
+    }
   }
 
   // Time slot operations
-  static getAvailableSlots(groundId: string, date: string): TimeSlot[] {
-    const ground = this.getGround(groundId);
-    if (!ground) return [];
-
-    const bookings = this.getBookings(groundId);
-    const dateBookings = bookings.filter(
-      (b: Booking) => b.date === date && b.status === 'confirmed'
-    );
-
-    const slots: TimeSlot[] = [];
-    for (let hour = ground.operatingHours.start; hour < ground.operatingHours.end; hour++) {
-      const isBooked = dateBookings.some(
-        (b: Booking) => hour >= b.startTime && hour < b.endTime
-      );
-
-      slots.push({
-        hour,
-        available: !isBooked,
-        booked: isBooked,
-        bookingId: isBooked
-          ? dateBookings.find((b: Booking) => hour >= b.startTime && hour < b.endTime)?.id
-          : undefined,
-      });
+  static async getAvailableSlots(groundId: string, date: string): Promise<TimeSlot[]> {
+    try {
+      const response = await apiService.get<TimeSlot[]>(`/bookings/availability?groundId=${groundId}&date=${date}`);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      return [];
+    } catch (error) {
+      console.error('Get available slots error:', error);
+      return [];
     }
-
-    return slots;
   }
 
-  static isSlotAvailable(
+  static async isSlotAvailable(
     groundId: string,
     date: string,
     startTime: number,
     endTime: number
-  ): boolean {
-    const slots = this.getAvailableSlots(groundId, date);
-    for (let hour = startTime; hour < endTime; hour++) {
-      const slot = slots.find((s) => s.hour === hour);
-      if (!slot || !slot.available) {
-        return false;
+  ): Promise<boolean> {
+    try {
+      const slots = await this.getAvailableSlots(groundId, date);
+      for (let hour = startTime; hour < endTime; hour++) {
+        const slot = slots.find((s) => s.hour === hour);
+        if (!slot || !slot.available) {
+          return false;
+        }
       }
+      return true;
+    } catch (error) {
+      console.error('Check slot availability error:', error);
+      return false;
     }
-    return true;
   }
 
   // Aggregate statistics operations
-  static getTotalBookings(): number {
-    return this.getBookings().length;
+  static async getTotalBookings(): Promise<number> {
+    try {
+      const bookings = await this.getBookings();
+      return bookings.length;
+    } catch (error) {
+      console.error('Get total bookings error:', error);
+      return 0;
+    }
   }
 
-  static getTotalRevenue(): number {
-    const bookings = this.getBookings();
-    return bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+  static async getTotalRevenue(): Promise<number> {
+    try {
+      const bookings = await this.getBookings();
+      return bookings.reduce((sum, b) => sum + b.totalPrice, 0);
+    } catch (error) {
+      console.error('Get total revenue error:', error);
+      return 0;
+    }
   }
 
-  static getTodayTotalBookings(): number {
-    const today = new Date().toISOString().split('T')[0];
-    const bookings = this.getBookings();
-    return bookings.filter((b) => b.date === today).length;
+  static async getTodayTotalBookings(): Promise<number> {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const bookings = await this.getBookings();
+      return bookings.filter((b) => b.date === today).length;
+    } catch (error) {
+      console.error('Get today bookings error:', error);
+      return 0;
+    }
   }
 
-  static getRevenueByGround(): Array<{ groundId: string; groundName: string; revenue: number }> {
-    const bookings = this.getBookings();
-    const grounds = this.getAllGrounds();
-    const revenueMap = new Map<string, number>();
+  static async getRevenueByGround(): Promise<Array<{ groundId: string; groundName: string; revenue: number }>> {
+    try {
+      const bookings = await this.getBookings();
+      const grounds = await this.getAllGrounds();
+      const revenueMap = new Map<string, number>();
 
-    bookings.forEach((b) => {
-      const current = revenueMap.get(b.groundId) || 0;
-      revenueMap.set(b.groundId, current + b.totalPrice);
-    });
+      bookings.forEach((b) => {
+        const current = revenueMap.get(b.groundId) || 0;
+        revenueMap.set(b.groundId, current + b.totalPrice);
+      });
 
-    return Array.from(revenueMap.entries()).map(([groundId, revenue]) => {
-      const ground = grounds.find((g) => g.id === groundId);
-      return {
-        groundId,
-        groundName: ground?.name || 'Unknown Ground',
-        revenue,
-      };
-    });
+      return Array.from(revenueMap.entries()).map(([groundId, revenue]) => {
+        const ground = grounds.find((g) => g.id === groundId);
+        return {
+          groundId,
+          groundName: ground?.name || 'Unknown Ground',
+          revenue,
+        };
+      });
+    } catch (error) {
+      console.error('Get revenue by ground error:', error);
+      return [];
+    }
   }
 
-  static getBookingsByGround(): Array<{ groundId: string; groundName: string; count: number }> {
-    const bookings = this.getBookings();
-    const grounds = this.getAllGrounds();
-    const countMap = new Map<string, number>();
+  static async getBookingsByGround(): Promise<Array<{ groundId: string; groundName: string; count: number }>> {
+    try {
+      const bookings = await this.getBookings();
+      const grounds = await this.getAllGrounds();
+      const countMap = new Map<string, number>();
 
-    bookings.forEach((b) => {
-      const current = countMap.get(b.groundId) || 0;
-      countMap.set(b.groundId, current + 1);
-    });
+      bookings.forEach((b) => {
+        const current = countMap.get(b.groundId) || 0;
+        countMap.set(b.groundId, current + 1);
+      });
 
-    return Array.from(countMap.entries()).map(([groundId, count]) => {
-      const ground = grounds.find((g) => g.id === groundId);
-      return {
-        groundId,
-        groundName: ground?.name || 'Unknown Ground',
-        count,
-      };
-    });
+      return Array.from(countMap.entries()).map(([groundId, count]) => {
+        const ground = grounds.find((g) => g.id === groundId);
+        return {
+          groundId,
+          groundName: ground?.name || 'Unknown Ground',
+          count,
+        };
+      });
+    } catch (error) {
+      console.error('Get bookings by ground error:', error);
+      return [];
+    }
   }
 
-  static getActiveGroundsCount(): number {
-    const grounds = this.getAllGrounds();
-    const bookings = this.getBookings();
-    const groundsWithBookings = new Set(bookings.map((b) => b.groundId));
-    return groundsWithBookings.size;
+  static async getActiveGroundsCount(): Promise<number> {
+    try {
+      const grounds = await this.getAllGrounds();
+      const bookings = await this.getBookings();
+      const groundsWithBookings = new Set(bookings.map((b) => b.groundId));
+      return groundsWithBookings.size;
+    } catch (error) {
+      console.error('Get active grounds count error:', error);
+      return 0;
+    }
   }
 
   // Utility

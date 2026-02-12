@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { FiUser } from 'react-icons/fi';
 import { BookingFormData } from '@/lib/types';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
@@ -9,6 +10,7 @@ import { validateBookingForm } from '@/lib/utils/validation';
 
 interface BookingFormProps {
   onSubmit: (data: BookingFormData) => void;
+  onFormSubmit?: (data: BookingFormData) => void; // For mobile: just validates and shows summary
   isLoading?: boolean;
   selectedStartTime: number | null;
   selectedEndTime: number | null;
@@ -17,11 +19,22 @@ interface BookingFormProps {
 
 export const BookingForm: React.FC<BookingFormProps> = ({
   onSubmit,
+  onFormSubmit,
   isLoading = false,
   selectedStartTime,
   selectedEndTime,
   selectedDate,
 }) => {
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
@@ -130,12 +143,19 @@ export const BookingForm: React.FC<BookingFormProps> = ({
       return;
     }
 
-    onSubmit({
+    const bookingData = {
       ...formData,
       date: selectedDate,
       startTime: selectedStartTime!,
       endTime: selectedEndTime!,
-    });
+    };
+
+    // On mobile: use onFormSubmit (shows summary), on desktop: use onSubmit (creates booking)
+    if (isMobile && onFormSubmit) {
+      onFormSubmit(bookingData);
+    } else {
+      onSubmit(bookingData);
+    }
   };
 
   const isFormValid =
@@ -147,22 +167,20 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     selectedEndTime !== null;
 
   return (
-    <Card className="border-2 border-green-100 shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b border-green-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-xl font-bold text-gray-900">Your Information</CardTitle>
-            <p className="text-sm text-gray-600 mt-1">Step 3 of 3 - Almost done!</p>
+    <Card className="border-2 border-[var(--primary-200)] shadow-lg" variant="elevated">
+      <CardHeader className="bg-[var(--primary-50)] dark:bg-[var(--primary-900)]/20 border-b border-[var(--primary-200)]">
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-lg sm:text-xl font-bold text-[var(--foreground)]">Your Information</CardTitle>
+            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-1">Step 3 of 3 - Almost done!</p>
           </div>
-          <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--primary-600)] rounded-full flex items-center justify-center flex-shrink-0">
+            <FiUser className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pt-4 sm:pt-6 p-4 sm:p-6">
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+      <CardContent className="pt-3 sm:pt-4 md:pt-6 p-3 sm:p-4 md:p-6">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5">
           <Input
             label="Full Name"
             type="text"
@@ -203,10 +221,10 @@ export const BookingForm: React.FC<BookingFormProps> = ({
             disabled={!isFormValid || isLoading}
             isLoading={isLoading}
           >
-            {isLoading ? 'Processing...' : 'Complete Booking'}
+            {isLoading ? 'Processing...' : isMobile && onFormSubmit ? 'Continue' : 'Complete Booking'}
           </Button>
           
-          <p className="text-xs text-center text-gray-500 mt-3">
+          <p className="text-xs text-center text-[var(--muted-foreground)] mt-3">
             By booking, you agree to our terms and conditions
           </p>
         </form>

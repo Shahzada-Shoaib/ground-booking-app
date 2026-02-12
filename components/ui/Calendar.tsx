@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import {
   formatMonthYear,
   getCalendarDays,
@@ -132,69 +133,45 @@ export const Calendar: React.FC<CalendarProps> = ({
   // Don't render until mounted to avoid hydration mismatch
   if (!mounted) {
     return (
-      <div className={`bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden w-full ${className}`}>
+      <div className={`bg-[var(--card)] rounded-xl border border-[var(--border)] shadow-md overflow-hidden w-full ${className}`}>
         <div className="p-8 flex items-center justify-center">
-          <div className="animate-pulse text-gray-400">Loading calendar...</div>
+          <div className="animate-pulse text-[var(--muted-foreground)]">Loading calendar...</div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden w-full ${className}`}>
+    <div className={`bg-[var(--card)] rounded-xl border border-[var(--border)] shadow-sm overflow-hidden w-full ${className}`}>
       {/* Header with navigation */}
-      <div className="flex items-center justify-between p-2 sm:p-3 border-b border-gray-200 bg-gradient-to-r from-green-50 to-white">
+      <div className="flex items-center justify-between p-2 sm:p-3 border-b border-[var(--border)] bg-[var(--muted)]">
         <button
           onClick={handlePreviousMonth}
-          className="p-1.5 sm:p-2 rounded-lg hover:bg-green-100 active:bg-green-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+          className="p-2 sm:p-2.5 rounded-lg hover:bg-[var(--primary-100)] active:bg-[var(--primary-200)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Previous month"
         >
-          <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 hover:text-green-700 transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          <FiChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--foreground)] hover:text-[var(--primary-600)] transition-colors" />
         </button>
 
-        <h3 className="text-sm sm:text-base font-semibold text-gray-900 px-1 sm:px-2 text-center">
+        <h3 className="text-sm sm:text-base font-semibold text-[var(--foreground)] px-1 sm:px-2 text-center">
           {monthYearLabel}
         </h3>
 
         <button
           onClick={handleNextMonth}
-          className="p-1.5 sm:p-2 rounded-lg hover:bg-green-100 active:bg-green-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1"
+          className="p-2 sm:p-2.5 rounded-lg hover:bg-[var(--primary-100)] active:bg-[var(--primary-200)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Next month"
         >
-          <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 hover:text-green-700 transition-colors"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          <FiChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--foreground)] hover:text-[var(--primary-600)] transition-colors" />
         </button>
       </div>
 
       {/* Week day headers */}
-      <div className="grid grid-cols-7 gap-0.5 p-1 sm:p-1.5 bg-gray-50 border-b border-gray-100">
+      <div className="grid grid-cols-7 gap-0.5 p-1 sm:p-1.5 bg-[var(--muted)] border-b border-[var(--border)]">
         {weekDays.map((day) => (
           <div
             key={day}
-            className="text-center text-[9px] sm:text-[10px] font-semibold text-gray-600 py-1 uppercase tracking-wide"
+            className="text-center text-[9px] sm:text-[10px] font-semibold text-[var(--muted-foreground)] py-1 uppercase tracking-wide"
           >
             {day}
           </div>
@@ -223,19 +200,19 @@ export const Calendar: React.FC<CalendarProps> = ({
               onClick={() => handleDateClick(day)}
               disabled={!selectable}
               className={`
-                aspect-square flex items-center justify-center text-xs sm:text-sm font-medium rounded
-                transition-all duration-200 ease-in-out min-h-[36px] sm:min-h-[40px]
-                focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1
+                aspect-square flex items-center justify-center text-sm sm:text-base font-medium rounded-lg
+                transition-all duration-200 ease-in-out min-h-[44px] sm:min-h-[48px]
+                focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1
                 ${
                   selected
-                    ? 'bg-green-600 text-white shadow-md transform scale-105 font-semibold z-10 relative'
+                    ? 'bg-[var(--primary-600)] text-white shadow-md transform scale-105 font-semibold z-10 relative'
                     : selectable
-                    ? 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:border hover:border-green-300 cursor-pointer active:scale-95'
-                    : 'text-gray-300 cursor-not-allowed bg-gray-50'
+                    ? 'text-[var(--foreground)] hover:bg-[var(--primary-50)] hover:text-[var(--primary-700)] hover:border hover:border-[var(--primary-300)] cursor-pointer active:scale-[0.95]'
+                    : 'text-[var(--muted-foreground)] cursor-not-allowed bg-[var(--muted)]'
                 }
                 ${
                   today && !selected
-                    ? 'border border-green-400 bg-green-50 text-green-700 font-semibold'
+                    ? 'border-2 border-[var(--primary-400)] bg-[var(--primary-50)] text-[var(--primary-700)] font-semibold'
                     : ''
                 }
                 ${!selectable && !today ? 'opacity-50' : ''}

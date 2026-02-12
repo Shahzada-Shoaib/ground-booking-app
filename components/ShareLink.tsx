@@ -38,24 +38,24 @@ export const ShareLink: React.FC<ShareLinkProps> = ({ groundId, groundName }) =>
   };
 
   return (
-    <Card className="shadow-xl border-2 border-green-100">
-      <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b border-green-100">
+    <Card className="shadow-xl border-2 border-[var(--primary-200)]" variant="elevated">
+      <CardHeader className="bg-[var(--primary-50)] border-b border-[var(--primary-200)]">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-green-600 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 bg-[var(--primary-600)] rounded-xl flex items-center justify-center shadow-lg">
             <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
             </svg>
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold text-gray-900">Share Booking Link</CardTitle>
-            <p className="text-sm text-gray-600 mt-1">Share this link with your customers</p>
+            <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Share Booking Link</CardTitle>
+            <p className="text-sm text-[var(--muted-foreground)] mt-1">Share this link with your customers</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         <div className="space-y-4 sm:space-y-5">
-          <div className="p-3 sm:p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
-            <p className="text-xs sm:text-sm text-blue-800">
+          <div className="p-3 sm:p-4 bg-[var(--primary-50)] border-2 border-[var(--primary-200)] rounded-xl">
+            <p className="text-xs sm:text-sm text-[var(--foreground)]">
               <span className="font-semibold">💡 Tip:</span> Share this link with customers to allow them to book time slots for{' '}
               <span className="font-bold">{groundName}</span>
             </p>

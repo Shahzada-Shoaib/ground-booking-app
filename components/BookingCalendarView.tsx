@@ -43,17 +43,17 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
 
   return (
     <div className="space-y-4">
-      <Card className="shadow-lg border-2 border-gray-100">
-        <CardHeader className="bg-gradient-to-r from-blue-50 to-white border-b border-blue-100">
+      <Card className="shadow-lg border-2 border-[var(--primary-200)]" variant="elevated">
+        <CardHeader className="bg-[var(--primary-50)] border-b border-[var(--primary-200)]">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-[var(--primary-600)] rounded-xl flex items-center justify-center shadow-lg">
               <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
             </div>
             <div>
-              <CardTitle className="text-2xl font-bold text-gray-900">Bookings Calendar</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">View bookings by date</p>
+              <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Bookings Calendar</CardTitle>
+              <p className="text-sm text-[var(--muted-foreground)] mt-1">View bookings by date</p>
             </div>
           </div>
         </CardHeader>
@@ -71,8 +71,8 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
 
           {/* Selected Date Bookings */}
           {selectedDate && dateBookings.length > 0 && (
-            <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-xl">
-              <h3 className="font-bold text-blue-900 mb-3">
+            <div className="mt-6 p-4 bg-[var(--primary-50)] border-2 border-[var(--primary-200)] rounded-xl">
+              <h3 className="font-bold text-[var(--foreground)] mb-3">
                 {dateBookings.length} Booking{dateBookings.length > 1 ? 's' : ''} on {formatDateShort(selectedDate)}
               </h3>
               <div className="space-y-2">
@@ -80,16 +80,16 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
                   <button
                     key={booking.id}
                     onClick={() => setSelectedBooking(booking)}
-                    className="w-full text-left p-3 bg-white rounded-lg border-2 border-blue-200 hover:border-blue-400 hover:shadow-md transition-all"
+                    className="w-full text-left p-3 bg-[var(--card)] rounded-lg border-2 border-[var(--primary-200)] hover:border-[var(--primary-400)] hover:shadow-md transition-all"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-semibold text-gray-900">{booking.customerName}</p>
-                        <p className="text-sm text-gray-600">
+                        <p className="font-semibold text-[var(--foreground)]">{booking.customerName}</p>
+                        <p className="text-sm text-[var(--muted-foreground)]">
                           {formatTimeRange(booking.startTime, booking.endTime)} • Rs. {booking.totalPrice}
                         </p>
                       </div>
-                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                       </svg>
                     </div>
@@ -100,8 +100,8 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
           )}
 
           {selectedDate && dateBookings.length === 0 && (
-            <div className="mt-6 p-6 text-center bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-              <p className="text-gray-500 font-medium">No bookings on this date</p>
+            <div className="mt-6 p-6 text-center bg-[var(--muted)] rounded-xl border-2 border-dashed border-[var(--border)]">
+              <p className="text-[var(--muted-foreground)] font-medium">No bookings on this date</p>
             </div>
           )}
         </CardContent>
@@ -117,26 +117,26 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
         {selectedBooking && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              <div className="p-3 bg-blue-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Customer</p>
-                <p className="font-semibold text-gray-900">{selectedBooking.customerName}</p>
+              <div className="p-3 bg-[var(--primary-50)] rounded-lg">
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Customer</p>
+                <p className="font-semibold text-[var(--foreground)]">{selectedBooking.customerName}</p>
               </div>
-              <div className="p-3 bg-green-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Date</p>
-                <p className="font-semibold text-gray-900">{formatDateShort(selectedBooking.date)}</p>
+              <div className="p-3 bg-[var(--primary-50)] rounded-lg">
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Date</p>
+                <p className="font-semibold text-[var(--foreground)]">{formatDateShort(selectedBooking.date)}</p>
               </div>
-              <div className="p-3 bg-purple-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Time</p>
-                <p className="font-semibold text-gray-900">{formatTimeRange(selectedBooking.startTime, selectedBooking.endTime)}</p>
+              <div className="p-3 bg-[var(--primary-50)] rounded-lg">
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Time</p>
+                <p className="font-semibold text-[var(--foreground)]">{formatTimeRange(selectedBooking.startTime, selectedBooking.endTime)}</p>
               </div>
-              <div className="p-3 bg-yellow-50 rounded-lg">
-                <p className="text-xs text-gray-500 mb-1">Amount</p>
-                <p className="font-semibold text-gray-900">Rs. {selectedBooking.totalPrice}</p>
+              <div className="p-3 bg-[var(--primary-50)] rounded-lg">
+                <p className="text-xs text-[var(--muted-foreground)] mb-1">Amount</p>
+                <p className="font-semibold text-[var(--foreground)]">Rs. {selectedBooking.totalPrice}</p>
               </div>
             </div>
-            <div className="pt-4 border-t border-gray-200 space-y-2">
-              <p className="text-sm"><span className="font-medium">Phone:</span> {selectedBooking.customerPhone}</p>
-              <p className="text-sm"><span className="font-medium">Email:</span> {selectedBooking.customerEmail}</p>
+            <div className="pt-4 border-t border-[var(--border)] space-y-2">
+              <p className="text-sm text-[var(--foreground)]"><span className="font-medium">Phone:</span> {selectedBooking.customerPhone}</p>
+              <p className="text-sm text-[var(--foreground)]"><span className="font-medium">Email:</span> {selectedBooking.customerEmail}</p>
             </div>
           </div>
         )}

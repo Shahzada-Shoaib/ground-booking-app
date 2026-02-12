@@ -111,15 +111,15 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
   }
 
   return (
-    <div className={`bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden w-full ${className}`}>
-      <div className="flex items-center justify-between p-2 sm:p-3 border-b border-gray-200 bg-gradient-to-r from-green-50 to-white">
+    <div className={`bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-md overflow-hidden w-full ${className}`}>
+      <div className="flex items-center justify-between p-2 sm:p-3 border-b border-[var(--border)] bg-[var(--primary-50)]">
         <button
           onClick={handlePreviousMonth}
-          className="p-2 sm:p-2 rounded-lg hover:bg-green-100 active:bg-green-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="p-2 sm:p-2 rounded-lg hover:bg-[var(--primary-100)] active:bg-[var(--primary-200)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Previous month"
         >
           <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 hover:text-green-700 transition-colors"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--foreground)] hover:text-[var(--primary-700)] transition-colors"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -133,17 +133,17 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
           </svg>
         </button>
 
-        <h3 className="text-sm sm:text-base font-semibold text-gray-900 px-1 sm:px-2 text-center">
+        <h3 className="text-sm sm:text-base font-semibold text-[var(--foreground)] px-1 sm:px-2 text-center">
           {monthYearLabel}
         </h3>
 
         <button
           onClick={handleNextMonth}
-          className="p-2 sm:p-2 rounded-lg hover:bg-green-100 active:bg-green-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
+          className="p-2 sm:p-2 rounded-lg hover:bg-[var(--primary-100)] active:bg-[var(--primary-200)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1 min-h-[44px] min-w-[44px] flex items-center justify-center"
           aria-label="Next month"
         >
           <svg
-            className="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 hover:text-green-700 transition-colors"
+            className="w-4 h-4 sm:w-5 sm:h-5 text-[var(--foreground)] hover:text-[var(--primary-700)] transition-colors"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -194,17 +194,17 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
               className={`
                 aspect-square flex flex-col items-center justify-center text-xs sm:text-sm font-medium rounded relative min-h-[36px] sm:min-h-[40px]
                 transition-all duration-200 ease-in-out
-                focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1
+                focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1
                 ${
                   selected
-                    ? 'bg-green-600 text-white shadow-md transform scale-105 font-semibold z-10 relative'
+                    ? 'bg-[var(--primary-600)] text-white shadow-md transform scale-105 font-semibold z-10 relative'
                     : selectable
-                    ? 'text-gray-700 hover:bg-green-50 hover:text-green-700 hover:border hover:border-green-300 cursor-pointer active:scale-95'
-                    : 'text-gray-300 cursor-not-allowed bg-gray-50'
+                    ? 'text-[var(--foreground)] hover:bg-[var(--primary-50)] hover:text-[var(--primary-700)] hover:border hover:border-[var(--primary-300)] cursor-pointer active:scale-95'
+                    : 'text-[var(--muted-foreground)] cursor-not-allowed bg-[var(--muted)]'
                 }
                 ${
                   today && !selected
-                    ? 'border border-green-400 bg-green-50 text-green-700 font-semibold'
+                    ? 'border border-[var(--primary-400)] bg-[var(--primary-50)] text-[var(--primary-700)] font-semibold'
                     : ''
                 }
                 ${!selectable && !today ? 'opacity-50' : ''}
@@ -217,13 +217,13 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
               {bookingsCount > 0 && (
                 <div className={`
                   absolute bottom-1 w-1.5 h-1.5 rounded-full
-                  ${selected ? 'bg-white' : 'bg-green-600'}
+                  ${selected ? 'bg-white' : 'bg-[var(--primary-600)]'}
                 `} />
               )}
               {bookingsCount > 1 && (
                 <div className={`
                   absolute bottom-1 left-1/2 transform -translate-x-1/2 text-[8px] font-bold
-                  ${selected ? 'text-white' : 'text-green-600'}
+                  ${selected ? 'text-white' : 'text-[var(--primary-600)]'}
                 `}>
                   {bookingsCount}
                 </div>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Card, CardContent } from './ui/Card';
+import { Button } from './ui/Button';
 
 interface EmptyStateProps {
   icon?: React.ReactNode;
@@ -20,7 +21,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   action,
 }) => {
   return (
-    <Card className="shadow-lg border-2 border-gray-200">
+    <Card className="shadow-lg border-2 border-[var(--border)]">
       <CardContent>
         <div className="text-center py-12">
           {icon && (
@@ -28,15 +29,14 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
               {icon}
             </div>
           )}
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">{title}</h3>
-          <p className="text-gray-500 mb-6 max-w-md mx-auto">{description}</p>
+          <h3 className="text-lg font-semibold text-[var(--foreground)] mb-2">{title}</h3>
+          <p className="text-[var(--muted-foreground)] mb-6 max-w-md mx-auto">{description}</p>
           {action && (
-            <button
+            <Button
               onClick={action.onClick}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium shadow-md hover:shadow-lg"
             >
               {action.label}
-            </button>
+            </Button>
           )}
         </div>
       </CardContent>

@@ -8,32 +8,36 @@ export const useTimeSlots = (groundId: string, date: string) => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!groundId || !date) {
-      setSlots([]);
-      setIsLoading(false);
-      return;
-    }
+    const loadSlots = async () => {
+      if (!groundId || !date) {
+        setSlots([]);
+        setIsLoading(false);
+        return;
+      }
 
-    try {
-      setIsLoading(true);
-      setError(null);
-      const availableSlots = BookingService.getAvailableSlots(groundId, date);
-      setSlots(availableSlots);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load time slots');
-      setSlots([]);
-    } finally {
-      setIsLoading(false);
-    }
+      try {
+        setIsLoading(true);
+        setError(null);
+        const availableSlots = await BookingService.getAvailableSlots(groundId, date);
+        setSlots(availableSlots);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load time slots');
+        setSlots([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadSlots();
   }, [groundId, date]);
 
-  const refreshSlots = () => {
+  const refreshSlots = async () => {
     if (!groundId || !date) return;
     
     try {
       setIsLoading(true);
       setError(null);
-      const availableSlots = BookingService.getAvailableSlots(groundId, date);
+      const availableSlots = await BookingService.getAvailableSlots(groundId, date);
       setSlots(availableSlots);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load time slots');

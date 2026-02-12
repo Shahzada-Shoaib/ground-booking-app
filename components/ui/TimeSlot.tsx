@@ -17,15 +17,15 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
 }) => {
   const getSlotStyles = () => {
     if (disabled || slot.booked) {
-      return 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-300';
+      return 'bg-[var(--gray-200)] text-[var(--gray-500)] cursor-not-allowed border-[var(--gray-300)] dark:bg-[var(--gray-800)] dark:text-[var(--gray-500)] dark:border-[var(--gray-700)]';
     }
     if (isSelected) {
-      return 'bg-green-600 text-white border-green-700 shadow-md transform scale-105';
+      return 'bg-[var(--primary-600)] text-white border-[var(--primary-600)] shadow-md transform scale-105';
     }
     if (slot.available) {
-      return 'bg-green-50 text-green-700 border-green-300 hover:bg-green-100 hover:border-green-400 cursor-pointer';
+      return 'bg-white text-[var(--primary-600)] border-[var(--border)] hover:bg-[var(--primary-50)] hover:text-[var(--primary-700)] hover:border-[var(--primary-300)] cursor-pointer';
     }
-    return 'bg-gray-200 text-gray-500 cursor-not-allowed border-gray-300';
+    return 'bg-[var(--gray-200)] text-[var(--gray-500)] cursor-not-allowed border-[var(--gray-300)] dark:bg-[var(--gray-800)] dark:text-[var(--gray-500)] dark:border-[var(--gray-700)]';
   };
 
   return (
@@ -35,7 +35,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
       disabled={disabled || slot.booked || !slot.available}
       className={`
         px-4 py-3 rounded-lg border-2 font-medium transition-all duration-200
-        focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+        focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-2 active:scale-[0.97]
         ${getSlotStyles()}
         ${!disabled && !slot.booked && slot.available ? 'hover:shadow-md' : ''}
       `}

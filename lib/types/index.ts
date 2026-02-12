@@ -11,6 +11,15 @@ export interface Ground {
     end: number; // Hour in 24-hour format (e.g., 22 for 10 PM)
   };
   pricePerHour: number;
+  location?: {
+    address?: string;
+    city?: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+    mapLink?: string; // Google Maps or other map service URL
+  };
   createdAt: string;
 }
 
@@ -53,4 +62,9 @@ export interface GroundSettings {
   startHour: number;
   endHour: number;
   pricePerHour: number;
+  location?: {
+    address?: string;
+    city?: string;
+    mapLink?: string;
+  };
 }
