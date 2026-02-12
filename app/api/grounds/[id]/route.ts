@@ -42,12 +42,13 @@ const groundUpdateSchema = z.object({
 // GET - Get single ground
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await connectDB();
+    const { id } = await params;
 
-    const ground = await Ground.findById(params.id);
+    const ground = await Ground.findById(id);
     
     if (!ground) {
       return NextResponse.json(
@@ -89,7 +90,7 @@ export async function GET(
 // PUT - Update ground (Admin only, but optional for development)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Try to authenticate, but don't block if not authenticated (for development)
@@ -101,12 +102,13 @@ export async function PUT(
     // }
 
     await connectDB();
+    const { id } = await params;
 
     const body = await request.json();
     const validatedData = groundUpdateSchema.parse(body);
 
     const ground = await Ground.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: validatedData },
       { new: true, runValidators: true }
     );
@@ -159,7 +161,7 @@ export async function PUT(
 // DELETE - Delete ground (Admin only, but optional for development)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Try to authenticate, but don't block if not authenticated (for development)
@@ -171,8 +173,9 @@ export async function DELETE(
     // }
 
     await connectDB();
+    const { id } = await params;
 
-    const ground = await Ground.findByIdAndDelete(params.id);
+    const ground = await Ground.findByIdAndDelete(id);
 
     if (!ground) {
       return NextResponse.json(

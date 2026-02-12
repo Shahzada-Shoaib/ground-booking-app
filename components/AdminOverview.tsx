@@ -62,7 +62,7 @@ export const AdminOverview: React.FC = () => {
           </CardContent>
         </Card>
 
-        <Card className="cursor-pointer hover:shadow-lg active:scale-[0.98] transition-all border-2 border-[var(--border)] min-h-[80px] sm:min-h-[100px] flex items-center" onClick={() => router.push('/')}>
+        <Card className="cursor-pointer hover:shadow-lg active:scale-[0.98] transition-all border-2 border-[var(--border)] min-h-[80px] sm:min-h-[100px] flex items-center" onClick={() => router.push('/dashboard')}>
           <CardContent className="p-3 sm:p-4 w-full">
             <div className="flex items-center gap-2 sm:gap-3">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--primary-100)] rounded-lg flex items-center justify-center flex-shrink-0">

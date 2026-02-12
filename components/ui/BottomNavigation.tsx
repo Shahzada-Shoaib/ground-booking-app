@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { usePathname, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 interface NavItem {
   label: string;
@@ -12,16 +13,23 @@ interface NavItem {
 export const BottomNavigation: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { isAuthenticated, user } = useAuth();
 
   // Hide bottom navigation on booking pages (customer-facing pages)
   if (pathname?.startsWith('/booking')) {
     return null;
   }
 
-  const navItems: NavItem[] = [
+  // Hide on login page (home page when not authenticated)
+  if (pathname === '/' && !isAuthenticated) {
+    return null;
+  }
+
+  // Admin navigation items
+  const adminNavItems: NavItem[] = [
     {
       label: 'Dashboard',
-      path: '/',
+      path: '/dashboard',
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -57,11 +65,77 @@ export const BottomNavigation: React.FC = () => {
     },
   ];
 
+  // Customer navigation items
+  const customerNavItems: NavItem[] = [
+    {
+      label: 'Home',
+      path: '/dashboard',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+      ),
+    },
+    {
+      label: 'My Bookings',
+      path: '/my-bookings',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+        </svg>
+      ),
+    },
+    {
+      label: 'Profile',
+      path: '/profile',
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+      ),
+    },
+    {
+      label: isAuthenticated ? 'Logout' : 'Login',
+      path: isAuthenticated ? '#' : '/',
+      icon: isAuthenticated ? (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      ) : (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+        </svg>
+      ),
+    },
+  ];
+
+  // Determine which nav items to show
+  const navItems =
+    isAuthenticated && user?.role === 'admin' ? adminNavItems : customerNavItems;
+
   const isActive = (path: string) => {
-    if (path === '/') {
-      return pathname === '/';
+    if (path === '#') {
+      return false;
+    }
+    if (path === '/dashboard') {
+      return pathname === '/dashboard';
     }
     return pathname.startsWith(path);
+  };
+
+  const handleNavClick = (path: string, label: string) => {
+    if (path === '#') {
+      // Handle logout
+      if (label === 'Logout') {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          router.push('/');
+        }
+      }
+      return;
+    }
+    router.push(path);
   };
 
   return (
@@ -72,7 +146,7 @@ export const BottomNavigation: React.FC = () => {
           return (
             <button
               key={item.path}
-              onClick={() => router.push(item.path)}
+              onClick={() => handleNavClick(item.path, item.label)}
               className={`
                 flex flex-col items-center justify-center flex-1 h-full min-h-[44px] px-2 py-1
                 transition-all duration-200 active:scale-95

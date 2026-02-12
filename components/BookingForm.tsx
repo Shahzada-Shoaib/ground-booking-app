@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FiUser } from 'react-icons/fi';
 import { BookingFormData } from '@/lib/types';
 import { Input } from './ui/Input';
 import { Button } from './ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import { validateBookingForm } from '@/lib/utils/validation';
+import { useAuth } from '@/context/AuthContext';
 
 interface BookingFormProps {
   onSubmit: (data: BookingFormData) => void;
@@ -25,6 +26,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
   selectedEndTime,
   selectedDate,
 }) => {
+  const { user, isAuthenticated } = useAuth();
   const [isMobile, setIsMobile] = React.useState(false);
 
   React.useEffect(() => {
@@ -35,11 +37,23 @@ export const BookingForm: React.FC<BookingFormProps> = ({
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
   const [formData, setFormData] = useState({
     customerName: '',
     customerPhone: '',
     customerEmail: '',
   });
+
+  // Pre-fill form with user data if logged in
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setFormData((prev) => ({
+        customerName: prev.customerName || user.name || '',
+        customerPhone: prev.customerPhone || user.phone || '',
+        customerEmail: prev.customerEmail || user.email || '',
+      }));
+    }
+  }, [isAuthenticated, user]);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});

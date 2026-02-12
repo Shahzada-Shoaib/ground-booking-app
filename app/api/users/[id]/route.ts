@@ -13,7 +13,7 @@ const userUpdateSchema = z.object({
 // GET - Get user profile
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = requireAuth(request);
@@ -22,16 +22,17 @@ export async function GET(
     }
 
     await connectDB();
+    const { id } = await params;
 
     // Users can only see their own profile unless admin
-    if (authResult.user.role !== 'admin' && authResult.user.userId !== params.id) {
+    if (authResult.user.role !== 'admin' && authResult.user.userId !== id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
       );
     }
 
-    const user = await User.findById(params.id).select('-password');
+    const user = await User.findById(id).select('-password');
     
     if (!user) {
       return NextResponse.json(
@@ -65,7 +66,7 @@ export async function GET(
 // PATCH - Update user profile
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = requireAuth(request);
@@ -74,9 +75,10 @@ export async function PATCH(
     }
 
     await connectDB();
+    const { id } = await params;
 
     // Users can only update their own profile unless admin
-    if (authResult.user.role !== 'admin' && authResult.user.userId !== params.id) {
+    if (authResult.user.role !== 'admin' && authResult.user.userId !== id) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
@@ -87,7 +89,7 @@ export async function PATCH(
     const validatedData = userUpdateSchema.parse(body);
 
     const user = await User.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: validatedData },
       { new: true, runValidators: true }
     ).select('-password');

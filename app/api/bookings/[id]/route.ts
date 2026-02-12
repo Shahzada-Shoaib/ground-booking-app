@@ -17,7 +17,7 @@ const bookingUpdateSchema = z.object({
 // GET - Get single booking - Auth optional for development
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Try to authenticate, but don't block if not authenticated (for development)
@@ -29,8 +29,9 @@ export async function GET(
     // }
 
     await connectDB();
+    const { id } = await params;
 
-    const booking = await Booking.findById(params.id);
+    const booking = await Booking.findById(id);
     
     if (!booking) {
       return NextResponse.json(
@@ -90,7 +91,7 @@ export async function GET(
 // PATCH - Update booking (reschedule, cancel, etc.)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = requireAuth(request);
@@ -99,8 +100,9 @@ export async function PATCH(
     }
 
     await connectDB();
+    const { id } = await params;
 
-    const booking = await Booking.findById(params.id);
+    const booking = await Booking.findById(id);
     
     if (!booking) {
       return NextResponse.json(
@@ -144,7 +146,7 @@ export async function PATCH(
 
       for (let hour = newStartTime; hour < newEndTime; hour++) {
         const conflictingBooking = await Booking.findOne({
-          _id: { $ne: params.id },
+          _id: { $ne: id },
           groundId: booking.groundId,
           date: newDate,
           status: { $in: ['pending', 'confirmed'] },
@@ -174,7 +176,7 @@ export async function PATCH(
     }
 
     const updatedBooking = await Booking.findByIdAndUpdate(
-      params.id,
+      id,
       { $set: validatedData },
       { new: true, runValidators: true }
     );
@@ -230,7 +232,7 @@ export async function PATCH(
 // DELETE - Cancel booking (soft delete by setting status to cancelled)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const authResult = requireAuth(request);
@@ -239,8 +241,9 @@ export async function DELETE(
     }
 
     await connectDB();
+    const { id } = await params;
 
-    const booking = await Booking.findById(params.id);
+    const booking = await Booking.findById(id);
     
     if (!booking) {
       return NextResponse.json(
@@ -259,7 +262,7 @@ export async function DELETE(
 
     // Cancel booking
     const cancelledBooking = await Booking.findByIdAndUpdate(
-      params.id,
+      id,
       {
         $set: {
           status: 'cancelled',

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -11,7 +11,7 @@ import { ToastContainer } from '@/components/ui/Toast';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { login, register } = useAuth();
+  const { login, register, isAuthenticated, isLoading: authLoading } = useAuth();
   const { showSuccess, showError, toasts, removeToast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,6 +22,13 @@ export default function LoginPage() {
     phone: '',
   });
 
+  // Redirect to dashboard if already authenticated
+  useEffect(() => {
+    if (!authLoading && isAuthenticated) {
+      router.push('/dashboard');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -30,7 +37,7 @@ export default function LoginPage() {
       if (isLogin) {
         await login(formData.email, formData.password);
         showSuccess('Login successful!');
-        router.push('/');
+        router.push('/dashboard');
       } else {
         if (!formData.name) {
           showError('Name is required');
@@ -44,7 +51,7 @@ export default function LoginPage() {
           phone: formData.phone || undefined,
         });
         showSuccess('Registration successful!');
-        router.push('/');
+        router.push('/dashboard');
       }
     } catch (error: any) {
       showError(error.message || 'Authentication failed');
@@ -52,6 +59,17 @@ export default function LoginPage() {
       setIsLoading(false);
     }
   };
+
+  // Redirect to home if not authenticated (home page is now login)
+  if (!authLoading && !isAuthenticated) {
+    router.push('/');
+    return null;
+  }
+
+  // Don't render if authenticated (will redirect)
+  if (isAuthenticated) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background)] flex items-center justify-center p-4">

@@ -17,11 +17,13 @@ import { formatDateShort, formatTimeRange, formatTime } from '@/lib/utils/dateUt
 import { getTodayDate } from '@/lib/utils/dateUtils';
 import { useToast } from '@/lib/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
+import { useAuth } from '@/context/AuthContext';
 
 function BookingPageContent() {
   const params = useParams();
   const router = useRouter();
   const groundId = params.id as string;
+  const { user, isAuthenticated } = useAuth();
 
   const [ground, setGround] = useState<Ground | null>(null);
   const [isLoading, setIsLoading] = useState(true);

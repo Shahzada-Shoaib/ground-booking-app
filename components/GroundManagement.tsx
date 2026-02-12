@@ -119,7 +119,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
     if (success) {
       showSuccess('Ground deleted successfully!');
       setShowDeleteModal(false);
-      router.push('/');
+      router.push('/dashboard');
     } else {
       showError('Failed to delete ground. Please try again.');
     }

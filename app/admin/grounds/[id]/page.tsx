@@ -22,13 +22,13 @@ function GroundManagementPageContent() {
       try {
         const foundGround = await BookingService.getGround(groundId);
         if (!foundGround) {
-          router.push('/');
+          router.push('/dashboard');
           return;
         }
         setGround(foundGround);
       } catch (error) {
         console.error('Error loading ground:', error);
-        router.push('/');
+        router.push('/dashboard');
       } finally {
         setIsLoading(false);
       }
@@ -62,7 +62,7 @@ function GroundManagementPageContent() {
           <h2 className="text-xl sm:text-2xl font-bold text-[var(--foreground)] mb-2">Ground Not Found</h2>
           <p className="text-sm sm:text-base text-[var(--muted-foreground)] mb-4 sm:mb-6">The ground you're looking for doesn't exist.</p>
           <Button
-            onClick={() => router.push('/')}
+            onClick={() => router.push('/dashboard')}
             className="w-full sm:w-auto min-h-[44px]"
           >
             Go to Dashboard
@@ -81,7 +81,7 @@ function GroundManagementPageContent() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 sm:gap-3 mb-2">
                 <Button
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/dashboard')}
                   variant="outline"
                   className="bg-white/20 border-white/30 text-white hover:bg-white/30 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[44px]"
                 >

@@ -76,7 +76,7 @@ function NewGroundPageContent() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 sm:gap-3 mb-2">
                 <Button
-                  onClick={() => router.push('/')}
+                  onClick={() => router.push('/dashboard')}
                   variant="outline"
                   className="bg-white/20 border-white/30 text-white hover:bg-white/30 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[44px]"
                 >
