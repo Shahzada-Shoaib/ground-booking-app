@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import connectDB from '@/lib/db/mongodb';
-import Booking from '@/lib/models/Booking';
+import Booking, { IBooking } from '@/lib/models/Booking';
 import Ground from '@/lib/models/Ground';
 import { requireAuth } from '@/lib/utils/middleware';
 import { z } from 'zod';
@@ -216,7 +216,7 @@ export async function POST(request: NextRequest) {
     const totalPrice = basePrice - discountAmount;
 
     // Create booking(s)
-    const bookings = [];
+    const bookings: IBooking[] = [];
     
     if (validatedData.type === 'recurring' && validatedData.recurringPattern) {
       // Create recurring bookings
