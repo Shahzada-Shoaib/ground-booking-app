@@ -47,6 +47,8 @@ export const Calendar: React.FC<CalendarProps> = ({
   // Set minDate only on client to avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
+    // Don't update effectiveMinDate based on selectedDate
+    // Only use minDate prop or default to today
     setEffectiveMinDate(minDate || getTodayDate());
     
     // Set initial month/year from selectedDate
@@ -55,7 +57,7 @@ export const Calendar: React.FC<CalendarProps> = ({
       setCurrentYear(year);
       setCurrentMonth(month);
     }
-  }, [minDate, selectedDate]);
+  }, [minDate]); // Remove selectedDate from dependencies to prevent previous dates from being disabled
 
   // Update current month/year when selectedDate changes externally
   useEffect(() => {
@@ -73,6 +75,17 @@ export const Calendar: React.FC<CalendarProps> = ({
 
   const handleDateClick = (day: number) => {
     const dateString = dateToISOString(currentYear, currentMonth, day);
+    const todayDateStr = getTodayDate();
+    
+    // Always allow today's date to be selected
+    if (dateString === todayDateStr) {
+      // Update calendar view to show today's month if not already visible
+      const today = new Date();
+      setCurrentYear(today.getFullYear());
+      setCurrentMonth(today.getMonth());
+      onDateChange(dateString);
+      return;
+    }
     
     // Check if date is in the past
     if (isPastDate(dateString)) {
@@ -89,6 +102,12 @@ export const Calendar: React.FC<CalendarProps> = ({
       return;
     }
 
+    // Always allow date selection, even if it's already selected
+    // This allows users to re-select a date if needed
+    // Update calendar view to show the selected date's month
+    const { year, month } = parseDateString(dateString);
+    setCurrentYear(year);
+    setCurrentMonth(month);
     onDateChange(dateString);
   };
 
@@ -104,10 +123,24 @@ export const Calendar: React.FC<CalendarProps> = ({
     setCurrentMonth(month);
   };
 
+  const handleTodayClick = () => {
+    const today = new Date();
+    const todayDateStr = getTodayDate();
+    setCurrentYear(today.getFullYear());
+    setCurrentMonth(today.getMonth());
+    onDateChange(todayDateStr);
+  };
+
   const isDateSelectable = (day: number): boolean => {
     if (!mounted) return false; // Don't allow selection until mounted
     
     const dateString = dateToISOString(currentYear, currentMonth, day);
+    
+    // Always allow today's date to be selectable
+    const todayDateStr = getTodayDate();
+    if (dateString === todayDateStr) {
+      return true;
+    }
     
     if (isPastDate(dateString)) {
       return false;
@@ -153,9 +186,18 @@ export const Calendar: React.FC<CalendarProps> = ({
           <FiChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-[var(--foreground)] hover:text-[var(--primary-600)] transition-colors" />
         </button>
 
-        <h3 className="text-sm sm:text-base font-semibold text-[var(--foreground)] px-1 sm:px-2 text-center">
-          {monthYearLabel}
-        </h3>
+        <div className="flex items-center gap-2 flex-1 justify-center">
+          <h3 className="text-sm sm:text-base font-semibold text-[var(--foreground)] px-1 sm:px-2 text-center">
+            {monthYearLabel}
+          </h3>
+          <button
+            onClick={handleTodayClick}
+            className="px-2 sm:px-3 py-1 sm:py-1.5 text-xs sm:text-sm font-medium rounded-md bg-[var(--primary-600)] text-white hover:bg-[var(--primary-700)] active:bg-[var(--primary-800)] transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:ring-offset-1"
+            aria-label="Go to today"
+          >
+            Today
+          </button>
+        </div>
 
         <button
           onClick={handleNextMonth}
@@ -198,7 +240,7 @@ export const Calendar: React.FC<CalendarProps> = ({
             <button
               key={`day-${day}`}
               onClick={() => handleDateClick(day)}
-              disabled={!selectable}
+              disabled={!selectable && !today}
               className={`
                 aspect-square flex items-center justify-center text-sm sm:text-base font-medium rounded-lg
                 transition-all duration-200 ease-in-out min-h-[44px] sm:min-h-[48px]
@@ -206,7 +248,7 @@ export const Calendar: React.FC<CalendarProps> = ({
                 ${
                   selected
                     ? 'bg-[var(--primary-600)] text-white shadow-md transform scale-105 font-semibold z-10 relative'
-                    : selectable
+                    : selectable || today
                     ? 'text-[var(--foreground)] hover:bg-[var(--primary-50)] hover:text-[var(--primary-700)] hover:border hover:border-[var(--primary-300)] cursor-pointer active:scale-[0.95]'
                     : 'text-[var(--muted-foreground)] cursor-not-allowed bg-[var(--muted)]'
                 }

@@ -36,7 +36,9 @@ function NewGroundPageContent() {
   const hourOptions = Array.from({ length: 24 }, (_, i) => i);
 
   const handleSave = async () => {
-    if (!settings.name.trim() || !settings.ownerName.trim() || settings.startHour >= settings.endHour) {
+    // Validate: endHour must be different from startHour (allows overnight: endHour < startHour)
+    const isValidTimeRange = settings.endHour !== settings.startHour;
+    if (!settings.name.trim() || !settings.ownerName.trim() || !isValidTimeRange) {
       showError('Please fill in all required fields correctly.');
       return;
     }
@@ -228,7 +230,7 @@ function NewGroundPageContent() {
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)] min-h-[44px] text-sm sm:text-base"
                   >
                     {hourOptions.map((hour) => (
-                      <option key={hour} value={hour}>
+                      <option key={hour} value={hour} style={{ backgroundColor: '#1a1a1d', color: '#ffffff' }}>
                         {formatTime(hour)}
                       </option>
                     ))}
@@ -250,7 +252,7 @@ function NewGroundPageContent() {
                     className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border-2 border-[var(--border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--ring)] transition-all bg-[var(--input)] text-[var(--foreground)] min-h-[44px] text-sm sm:text-base"
                   >
                     {hourOptions.map((hour) => (
-                      <option key={hour} value={hour}>
+                      <option key={hour} value={hour} style={{ backgroundColor: '#1a1a1d', color: '#ffffff' }}>
                         {formatTime(hour)}
                       </option>
                     ))}
@@ -292,7 +294,7 @@ function NewGroundPageContent() {
                 <Button
                   onClick={handleSave}
                   isLoading={isSaving}
-                  disabled={!settings.name.trim() || !settings.ownerName.trim() || settings.startHour >= settings.endHour}
+                  disabled={!settings.name.trim() || !settings.ownerName.trim() || settings.endHour === settings.startHour}
                   className="w-full sm:w-auto px-4 sm:px-6 md:px-8 py-2.5 sm:py-3 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl min-h-[44px]"
                 >
                   ✨ Create Ground

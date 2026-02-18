@@ -139,6 +139,20 @@ html {
   color: var(--background);
 }
 
+/* Select dropdown option styling */
+select option {
+  background: var(--background);
+  color: var(--foreground);
+  padding: 0.5rem;
+}
+
+select option:checked,
+select option:hover,
+select option:focus {
+  background: var(--primary-500);
+  color: var(--background);
+}
+
 /* Animations */
 @keyframes fadeIn {
   from {

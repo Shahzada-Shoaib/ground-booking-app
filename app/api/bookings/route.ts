@@ -129,10 +129,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = bookingSchema.parse(body);
 
-    // Validate time range
-    if (validatedData.endTime <= validatedData.startTime) {
+    // Validate time range - allow overnight bookings (endTime < startTime)
+    if (validatedData.endTime === validatedData.startTime) {
       return NextResponse.json(
-        { error: 'End time must be after start time' },
+        { error: 'Start time and end time cannot be the same' },
         { status: 400 }
       );
     }
@@ -161,23 +161,118 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check availability for all time slots
-    const hours = validatedData.endTime - validatedData.startTime;
-    for (let hour = validatedData.startTime; hour < validatedData.endTime; hour++) {
-      const conflictingBooking = await Booking.findOne({
-        groundId: validatedData.groundId,
-        date: validatedData.date,
-        status: { $in: ['pending', 'confirmed'] },
-        $or: [
-          { startTime: { $lte: hour }, endTime: { $gt: hour } },
-        ],
-      });
+    // Helper function to calculate hours (handles overnight)
+    const calculateHours = (startTime: number, endTime: number): number => {
+      if (endTime < startTime) {
+        // Overnight: from startTime to 24, then 0 to endTime
+        return (24 - startTime) + endTime;
+      }
+      return endTime - startTime;
+    };
 
-      if (conflictingBooking) {
+    const hours = calculateHours(validatedData.startTime, validatedData.endTime);
+
+    // Check availability for all time slots (handles overnight bookings)
+    const isOvernightBooking = validatedData.endTime < validatedData.startTime;
+    
+    if (isOvernightBooking) {
+      // Check today's date from startTime to 23
+      for (let hour = validatedData.startTime; hour <= 23; hour++) {
+        const conflictingBooking = await Booking.findOne({
+          groundId: validatedData.groundId,
+          date: validatedData.date,
+          status: { $in: ['pending', 'confirmed'] },
+          $or: [
+            // Normal booking that overlaps
+            { startTime: { $lte: hour }, endTime: { $gt: hour } },
+            // Overnight booking that overlaps (from startTime to 23)
+            { 
+              $expr: { 
+                $and: [
+                  { $lt: ['$endTime', '$startTime'] },
+                  { $gte: ['$startTime', hour] }
+                ]
+              }
+            }
+          ],
+        });
+
+        if (conflictingBooking) {
+          return NextResponse.json(
+            { error: `Time slot ${hour}:00 on ${validatedData.date} is already booked` },
+            { status: 400 }
+          );
+        }
+      }
+
+      // Check next day's date from 0 to endTime
+      const nextDate = new Date(validatedData.date);
+      nextDate.setDate(nextDate.getDate() + 1);
+      const nextDateStr = nextDate.toISOString().split('T')[0];
+
+      // Also check if next day is in maintenance
+      if (ground.maintenanceDates?.includes(nextDateStr)) {
         return NextResponse.json(
-          { error: `Time slot ${hour}:00 is already booked` },
+          { error: 'Ground is under maintenance on the next day' },
           { status: 400 }
         );
+      }
+
+      for (let hour = 0; hour < validatedData.endTime; hour++) {
+        const conflictingBooking = await Booking.findOne({
+          groundId: validatedData.groundId,
+          date: nextDateStr,
+          status: { $in: ['pending', 'confirmed'] },
+          $or: [
+            // Normal booking that overlaps
+            { startTime: { $lte: hour }, endTime: { $gt: hour } },
+            // Overnight booking that overlaps (from 0 to endTime)
+            { 
+              $expr: { 
+                $and: [
+                  { $lt: ['$endTime', '$startTime'] },
+                  { $lt: [hour, '$endTime'] }
+                ]
+              }
+            }
+          ],
+        });
+
+        if (conflictingBooking) {
+          return NextResponse.json(
+            { error: `Time slot ${hour}:00 on ${nextDateStr} is already booked` },
+            { status: 400 }
+          );
+        }
+      }
+    } else {
+      // Normal booking: same day
+      for (let hour = validatedData.startTime; hour < validatedData.endTime; hour++) {
+        const conflictingBooking = await Booking.findOne({
+          groundId: validatedData.groundId,
+          date: validatedData.date,
+          status: { $in: ['pending', 'confirmed'] },
+          $or: [
+            // Normal booking that overlaps
+            { startTime: { $lte: hour }, endTime: { $gt: hour } },
+            // Overnight booking that overlaps (from startTime to 23)
+            { 
+              $expr: { 
+                $and: [
+                  { $lt: ['$endTime', '$startTime'] },
+                  { $gte: ['$startTime', hour] }
+                ]
+              }
+            }
+          ],
+        });
+
+        if (conflictingBooking) {
+          return NextResponse.json(
+            { error: `Time slot ${hour}:00 is already booked` },
+            { status: 400 }
+          );
+        }
       }
     }
 
@@ -196,10 +291,30 @@ export async function POST(request: NextRequest) {
       basePrice = seasonalPrice.pricePerHour * hours;
     }
 
-    // Apply peak pricing if applicable
+    // Apply peak pricing if applicable (handles overnight bookings)
     if (ground.peakPricing && ground.peakPricing.length > 0) {
       const peakPrice = ground.peakPricing.find(pp => {
-        return validatedData.startTime >= pp.startHour && validatedData.endTime <= pp.endHour;
+        if (isOvernightBooking) {
+          // For overnight bookings, check if booking spans peak hours
+          // Peak hours could be on same day (startHour to 23) or next day (0 to endHour)
+          const peakIsOvernight = pp.endHour < pp.startHour;
+          
+          if (peakIsOvernight) {
+            // Peak hours are overnight: check if booking overlaps
+            // Booking from startTime to 23 overlaps if startTime >= pp.startHour
+            // Booking from 0 to endTime overlaps if endTime <= pp.endHour
+            return (validatedData.startTime >= pp.startHour) || (validatedData.endTime <= pp.endHour);
+          } else {
+            // Peak hours are normal: check if booking overlaps
+            // Booking from startTime to 23 overlaps if startTime >= pp.startHour
+            // Or booking from 0 to endTime overlaps if endTime <= pp.endHour
+            return (validatedData.startTime >= pp.startHour && validatedData.startTime <= pp.endHour) ||
+                   (validatedData.endTime >= pp.startHour && validatedData.endTime <= pp.endHour);
+          }
+        } else {
+          // Normal booking: check if fully within peak hours
+          return validatedData.startTime >= pp.startHour && validatedData.endTime <= pp.endHour;
+        }
       });
       if (peakPrice) {
         basePrice = basePrice * peakPrice.multiplier;
@@ -231,21 +346,89 @@ export async function POST(request: NextRequest) {
       while (currentDate <= endDate && count < maxOccurrences) {
         const dateStr = currentDate.toISOString().split('T')[0];
         
-        // Check availability for this date
+        // Check availability for this date (handles overnight bookings)
         let isAvailable = true;
-        for (let hour = validatedData.startTime; hour < validatedData.endTime; hour++) {
-          const conflictingBooking = await Booking.findOne({
-            groundId: validatedData.groundId,
-            date: dateStr,
-            status: { $in: ['pending', 'confirmed'] },
-            $or: [
-              { startTime: { $lte: hour }, endTime: { $gt: hour } },
-            ],
-          });
+        
+        if (isOvernightBooking) {
+          // Check today's date from startTime to 23
+          for (let hour = validatedData.startTime; hour <= 23; hour++) {
+            const conflictingBooking = await Booking.findOne({
+              groundId: validatedData.groundId,
+              date: dateStr,
+              status: { $in: ['pending', 'confirmed'] },
+              $or: [
+                { startTime: { $lte: hour }, endTime: { $gt: hour } },
+                { 
+                  $expr: { 
+                    $and: [
+                      { $lt: ['$endTime', '$startTime'] },
+                      { $gte: ['$startTime', hour] }
+                    ]
+                  }
+                }
+              ],
+            });
 
-          if (conflictingBooking) {
-            isAvailable = false;
-            break;
+            if (conflictingBooking) {
+              isAvailable = false;
+              break;
+            }
+          }
+
+          if (isAvailable) {
+            // Check next day's date from 0 to endTime
+            const nextDate = new Date(currentDate);
+            nextDate.setDate(nextDate.getDate() + 1);
+            const nextDateStr = nextDate.toISOString().split('T')[0];
+
+            for (let hour = 0; hour < validatedData.endTime; hour++) {
+              const conflictingBooking = await Booking.findOne({
+                groundId: validatedData.groundId,
+                date: nextDateStr,
+                status: { $in: ['pending', 'confirmed'] },
+                $or: [
+                  { startTime: { $lte: hour }, endTime: { $gt: hour } },
+                  { 
+                    $expr: { 
+                      $and: [
+                        { $lt: ['$endTime', '$startTime'] },
+                        { $lt: [hour, '$endTime'] }
+                      ]
+                    }
+                  }
+                ],
+              });
+
+              if (conflictingBooking) {
+                isAvailable = false;
+                break;
+              }
+            }
+          }
+        } else {
+          // Normal booking: same day
+          for (let hour = validatedData.startTime; hour < validatedData.endTime; hour++) {
+            const conflictingBooking = await Booking.findOne({
+              groundId: validatedData.groundId,
+              date: dateStr,
+              status: { $in: ['pending', 'confirmed'] },
+              $or: [
+                { startTime: { $lte: hour }, endTime: { $gt: hour } },
+                { 
+                  $expr: { 
+                    $and: [
+                      { $lt: ['$endTime', '$startTime'] },
+                      { $gte: ['$startTime', hour] }
+                    ]
+                  }
+                }
+              ],
+            });
+
+            if (conflictingBooking) {
+              isAvailable = false;
+              break;
+            }
           }
         }
 

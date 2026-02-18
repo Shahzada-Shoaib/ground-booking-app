@@ -659,7 +659,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                 <Button
                   onClick={handleSave}
                   isLoading={isSaving}
-                  disabled={!settings.name.trim() || !settings.ownerName.trim() || settings.startHour >= settings.endHour}
+                  disabled={!settings.name.trim() || !settings.ownerName.trim() || settings.endHour === settings.startHour}
                   className="w-full sm:w-auto px-6 sm:px-8 py-3 text-sm sm:text-base font-semibold shadow-lg hover:shadow-xl min-h-[44px]"
                 >
                   {showAddGround ? '✨ Create Ground' : '💾 Save Settings'}

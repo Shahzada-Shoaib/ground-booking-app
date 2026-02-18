@@ -30,7 +30,7 @@ function BookingPageContent() {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedStartTime, setSelectedStartTime] = useState<number | null>(null);
   const [selectedEndTime, setSelectedEndTime] = useState<number | null>(null);
-  const [selectedSlots, setSelectedSlots] = useState<number[]>([]); // Array of selected slot hours
+  const [selectedSlots, setSelectedSlots] = useState<Record<string, number[]>>({}); // Date-wise selected slot hours: { "2026-02-19": [9, 10, 11], "2026-02-20": [14, 15] }
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const { showError, toasts, removeToast } = useToast();
@@ -59,7 +59,8 @@ function BookingPageContent() {
 
   // Calculate current step
   const getCurrentStep = () => {
-    if (selectedDate && ((selectedSlots && selectedSlots.length > 0) || (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0))) {
+    const currentDateSlots = selectedSlots[selectedDate] || [];
+    if (selectedDate && ((currentDateSlots.length > 0) || (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0))) {
       return 3; // Form step
     } else if (selectedDate) {
       return 2; // Time selection step
@@ -99,12 +100,17 @@ function BookingPageContent() {
     if (startTime < 0 || endTime < 0) {
       setSelectedStartTime(null);
       setSelectedEndTime(null);
-      setSelectedSlots([]);
+      // Clear slots for current date only
+      setSelectedSlots(prev => {
+        const newState = { ...prev };
+        delete newState[selectedDate];
+        return newState;
+      });
     } else {
       setSelectedStartTime(startTime);
       setSelectedEndTime(endTime);
-      // Also update selectedSlots for multi-select
-      setSelectedSlots([startTime]);
+      // Also update selectedSlots for multi-select (date-wise)
+      setSelectedSlots(prev => ({ ...prev, [selectedDate]: [startTime] }));
       // Smooth scroll to form
       setTimeout(() => {
         const formElement = document.getElementById('booking-form');
@@ -117,24 +123,41 @@ function BookingPageContent() {
 
   const handleSlotToggle = (hour: number) => {
     setSelectedSlots(prev => {
-      const isSelected = prev.includes(hour);
+      const currentDateSlots = prev[selectedDate] || [];
+      const isSelected = currentDateSlots.includes(hour);
       let newSlots: number[];
       
       if (isSelected) {
         // Remove slot
-        newSlots = prev.filter(h => h !== hour);
+        newSlots = currentDateSlots.filter(h => h !== hour);
       } else {
         // Add slot
-        newSlots = [...prev, hour].sort((a, b) => a - b);
+        newSlots = [...currentDateSlots, hour].sort((a, b) => a - b);
       }
       
-      // Update selectedStartTime and selectedEndTime based on selected slots
+      // Update selectedStartTime and selectedEndTime based on selected slots for current date
       if (newSlots.length === 0) {
         setSelectedStartTime(null);
         setSelectedEndTime(null);
       } else {
-        setSelectedStartTime(newSlots[0]);
-        setSelectedEndTime(newSlots[newSlots.length - 1] + 1);
+        const minSlot = newSlots[0];
+        const maxSlot = newSlots[newSlots.length - 1];
+        
+        // Check if this is an overnight booking (ground is overnight and we're selecting late hours)
+        const isOvernightGround = ground && ground.operatingHours.end < ground.operatingHours.start;
+        
+        if (isOvernightGround && maxSlot >= 23) {
+          // User is selecting slots that go into the next day
+          // For overnight bookings, endTime will be < startTime
+          // We'll handle this in the booking creation
+          setSelectedStartTime(minSlot);
+          // For overnight, endTime should be the last selected hour + 1, but if it's from next day, it will be < startTime
+          // We'll calculate this properly when creating the booking
+          setSelectedEndTime(maxSlot + 1);
+        } else {
+          setSelectedStartTime(minSlot);
+          setSelectedEndTime(maxSlot + 1);
+        }
       }
       
       // Smooth scroll to form if slots are selected
@@ -147,15 +170,17 @@ function BookingPageContent() {
         }, 100);
       }
       
-      return newSlots;
+      // Return updated state with current date's slots
+      return { ...prev, [selectedDate]: newSlots };
     });
   };
 
   const handleDateChange = (date: string) => {
     setSelectedDate(date);
+    // Don't clear slots - they are stored per date and should persist
+    // Only reset time selection for the new date
     setSelectedStartTime(null);
     setSelectedEndTime(null);
-    setSelectedSlots([]);
   };
 
   // Handler for mobile: just validates and shows summary
@@ -266,11 +291,25 @@ function BookingPageContent() {
         setSelectedEndTime(null);
       } else if (selectedStartTime !== null && selectedEndTime !== null) {
         // Single range booking (legacy behavior)
+        // Check if this is an overnight booking
+        const isOvernightGround = ground.operatingHours.end < ground.operatingHours.start;
+        let finalStartTime = selectedStartTime;
+        let finalEndTime = selectedEndTime;
+        
+        // If ground is overnight and endTime would be >= 24, it's an overnight booking
+        if (isOvernightGround && selectedEndTime > 23) {
+          // This is an overnight booking
+          // endTime should be the hour on the next day (0-23), so we need to calculate it
+          // If selectedEndTime is 24, it means 0 (midnight next day)
+          // If selectedEndTime is 25, it means 1 AM next day, etc.
+          finalEndTime = selectedEndTime - 24;
+        }
+        
         const isAvailable = await BookingService.isSlotAvailable(
           ground.id,
           selectedDate,
-          selectedStartTime,
-          selectedEndTime
+          finalStartTime,
+          finalEndTime
         );
 
         if (!isAvailable) {
@@ -283,8 +322,8 @@ function BookingPageContent() {
           {
             ...formData,
             date: selectedDate,
-            startTime: selectedStartTime,
-            endTime: selectedEndTime,
+            startTime: finalStartTime,
+            endTime: finalEndTime,
           },
           ground.id
         );
@@ -495,13 +534,13 @@ function BookingPageContent() {
               selectedStartTime={selectedStartTime}
               selectedEndTime={selectedEndTime}
               onTimeSelection={handleTimeSelection}
-              selectedSlots={selectedSlots}
+              selectedSlots={selectedSlots[selectedDate] || []}
               onSlotToggle={handleSlotToggle}
             />
             </div>
 
             {/* Booking Form */}
-            {((selectedSlots && selectedSlots.length > 0) || (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0)) && !showSummaryForConfirmation && (
+            {((selectedSlots[selectedDate] && selectedSlots[selectedDate].length > 0) || (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0)) && !showSummaryForConfirmation && (
               <div id="booking-form" className="animate-fade-in">
                 <BookingForm
                   onSubmit={handleSubmit}

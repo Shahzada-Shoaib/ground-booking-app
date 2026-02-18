@@ -44,6 +44,7 @@ export interface TimeSlot {
   available: boolean;
   booked: boolean;
   bookingId?: string; // If booked, reference to booking
+  date?: string; // Optional: date this slot belongs to (YYYY-MM-DD format)
 }
 
 export interface BookingFormData {

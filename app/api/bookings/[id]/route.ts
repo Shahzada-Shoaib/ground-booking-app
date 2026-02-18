@@ -129,12 +129,24 @@ export async function PATCH(
       const newStartTime = validatedData.startTime !== undefined ? validatedData.startTime : booking.startTime;
       const newEndTime = validatedData.endTime !== undefined ? validatedData.endTime : booking.endTime;
 
-      if (newEndTime <= newStartTime) {
+      // Validate time range - allow overnight bookings
+      if (newEndTime === newStartTime) {
         return NextResponse.json(
-          { error: 'End time must be after start time' },
+          { error: 'Start time and end time cannot be the same' },
           { status: 400 }
         );
       }
+
+      // Helper function to calculate hours (handles overnight)
+      const calculateHours = (startTime: number, endTime: number): number => {
+        if (endTime < startTime) {
+          return (24 - startTime) + endTime;
+        }
+        return endTime - startTime;
+      };
+
+      const newHours = calculateHours(newStartTime, newEndTime);
+      const isOvernightBooking = newEndTime < newStartTime;
 
       // Check availability
       const ground = await Ground.findById(booking.groundId);
@@ -145,24 +157,140 @@ export async function PATCH(
         );
       }
 
-      for (let hour = newStartTime; hour < newEndTime; hour++) {
-        const conflictingBooking = await Booking.findOne({
-          _id: { $ne: id },
-          groundId: booking.groundId,
-          date: newDate,
-          status: { $in: ['pending', 'confirmed'] },
-          $or: [
-            { startTime: { $lte: hour }, endTime: { $gt: hour } },
-          ],
-        });
+      // Check availability (handles overnight bookings)
+      if (isOvernightBooking) {
+        // Check today's date from startTime to 23
+        for (let hour = newStartTime; hour <= 23; hour++) {
+          const conflictingBooking = await Booking.findOne({
+            _id: { $ne: id },
+            groundId: booking.groundId,
+            date: newDate,
+            status: { $in: ['pending', 'confirmed'] },
+            $or: [
+              { startTime: { $lte: hour }, endTime: { $gt: hour } },
+              { 
+                $expr: { 
+                  $and: [
+                    { $lt: ['$endTime', '$startTime'] },
+                    { $gte: ['$startTime', hour] }
+                  ]
+                }
+              }
+            ],
+          });
 
-        if (conflictingBooking) {
-          return NextResponse.json(
-            { error: `Time slot ${hour}:00 is already booked` },
-            { status: 400 }
-          );
+          if (conflictingBooking) {
+            return NextResponse.json(
+              { error: `Time slot ${hour}:00 on ${newDate} is already booked` },
+              { status: 400 }
+            );
+          }
+        }
+
+        // Check next day's date from 0 to endTime
+        const nextDate = new Date(newDate);
+        nextDate.setDate(nextDate.getDate() + 1);
+        const nextDateStr = nextDate.toISOString().split('T')[0];
+
+        for (let hour = 0; hour < newEndTime; hour++) {
+          const conflictingBooking = await Booking.findOne({
+            _id: { $ne: id },
+            groundId: booking.groundId,
+            date: nextDateStr,
+            status: { $in: ['pending', 'confirmed'] },
+            $or: [
+              { startTime: { $lte: hour }, endTime: { $gt: hour } },
+              { 
+                $expr: { 
+                  $and: [
+                    { $lt: ['$endTime', '$startTime'] },
+                    { $lt: [hour, '$endTime'] }
+                  ]
+                }
+              }
+            ],
+          });
+
+          if (conflictingBooking) {
+            return NextResponse.json(
+              { error: `Time slot ${hour}:00 on ${nextDateStr} is already booked` },
+              { status: 400 }
+            );
+          }
+        }
+      } else {
+        // Normal booking: same day
+        for (let hour = newStartTime; hour < newEndTime; hour++) {
+          const conflictingBooking = await Booking.findOne({
+            _id: { $ne: id },
+            groundId: booking.groundId,
+            date: newDate,
+            status: { $in: ['pending', 'confirmed'] },
+            $or: [
+              { startTime: { $lte: hour }, endTime: { $gt: hour } },
+              { 
+                $expr: { 
+                  $and: [
+                    { $lt: ['$endTime', '$startTime'] },
+                    { $gte: ['$startTime', hour] }
+                  ]
+                }
+              }
+            ],
+          });
+
+          if (conflictingBooking) {
+            return NextResponse.json(
+              { error: `Time slot ${hour}:00 is already booked` },
+              { status: 400 }
+            );
+          }
         }
       }
+
+      // Recalculate price if time changed
+      let newTotalPrice = booking.totalPrice;
+      if (validatedData.startTime !== undefined || validatedData.endTime !== undefined) {
+        let basePrice = ground.pricePerHour * newHours;
+
+        // Apply seasonal pricing if applicable
+        const bookingDate = new Date(newDate);
+        const seasonalPrice = ground.seasonalPricing?.find(sp => {
+          const start = new Date(sp.startDate);
+          const end = new Date(sp.endDate);
+          return bookingDate >= start && bookingDate <= end;
+        });
+
+        if (seasonalPrice) {
+          basePrice = seasonalPrice.pricePerHour * newHours;
+        }
+
+        // Apply peak pricing if applicable (handles overnight bookings)
+        if (ground.peakPricing && ground.peakPricing.length > 0) {
+          const peakPrice = ground.peakPricing.find(pp => {
+            if (isOvernightBooking) {
+              const peakIsOvernight = pp.endHour < pp.startHour;
+              if (peakIsOvernight) {
+                return (newStartTime >= pp.startHour) || (newEndTime <= pp.endHour);
+              } else {
+                return (newStartTime >= pp.startHour && newStartTime <= pp.endHour) ||
+                       (newEndTime >= pp.startHour && newEndTime <= pp.endHour);
+              }
+            } else {
+              return newStartTime >= pp.startHour && newEndTime <= pp.endHour;
+            }
+          });
+          if (peakPrice) {
+            basePrice = basePrice * peakPrice.multiplier;
+          }
+        }
+
+        newTotalPrice = basePrice - (booking.discountAmount || 0);
+      }
+
+      // Update hours and price in the booking data
+      validatedData.hours = newHours;
+      validatedData.totalPrice = newTotalPrice;
 
       // Update booking with reschedule info
       // Create update object with rescheduledFrom
