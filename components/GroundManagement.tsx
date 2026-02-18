@@ -114,8 +114,8 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    const success = deleteGround(ground.id);
+  const confirmDelete = async () => {
+    const success = await deleteGround(ground.id);
     if (success) {
       showSuccess('Ground deleted successfully!');
       setShowDeleteModal(false);
@@ -125,10 +125,9 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
     }
   };
 
-  const handleCancelBooking = (bookingId: string) => {
-    const success = cancelBooking(bookingId);
+  const handleCancelBooking = async (bookingId: string) => {
+    const success = await cancelBooking(bookingId);
     if (success) {
-      refreshBookings();
       showSuccess('Booking cancelled successfully');
     } else {
       showError('Failed to cancel booking. Please try again.');
