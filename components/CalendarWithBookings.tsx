@@ -102,9 +102,9 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
 
   if (!mounted) {
     return (
-      <div className={`bg-white rounded-lg border border-gray-200 shadow-md overflow-hidden w-full ${className}`}>
+      <div className={`bg-[var(--card)] rounded-lg border border-[var(--border)] shadow-md overflow-hidden w-full ${className}`}>
         <div className="p-8 flex items-center justify-center">
-          <div className="animate-pulse text-gray-400">Loading calendar...</div>
+          <div className="animate-pulse text-[var(--muted-foreground)]">Loading calendar...</div>
         </div>
       </div>
     );
@@ -158,11 +158,11 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-0.5 p-1 sm:p-1.5 bg-gray-50 border-b border-gray-100">
+      <div className="grid grid-cols-7 gap-0.5 p-1 sm:p-1.5 bg-[var(--muted)] border-b border-[var(--border)]">
         {weekDays.map((day) => (
           <div
             key={day}
-            className="text-center text-[9px] sm:text-[10px] font-semibold text-gray-600 py-1 uppercase tracking-wide"
+            className="text-center text-[9px] sm:text-[10px] font-semibold text-[var(--muted-foreground)] py-1 uppercase tracking-wide"
           >
             {day}
           </div>

@@ -38,7 +38,7 @@ export const UserMenu: React.FC = () => {
       <Button
         onClick={() => router.push('/')}
         variant="outline"
-        className="bg-white/20 border-white/30 text-white hover:bg-white/30 min-h-[44px] px-4 py-2 text-sm sm:text-base"
+        className="bg-white/10 border-white/20 text-white hover:bg-white/20 min-h-[44px] px-4 py-2 text-sm sm:text-base"
       >
         Login
       </Button>
@@ -61,7 +61,7 @@ export const UserMenu: React.FC = () => {
         className="flex items-center gap-2 sm:gap-3 px-2 sm:px-3 py-2 rounded-lg hover:bg-white/10 transition-colors min-h-[44px]"
         aria-label="User menu"
       >
-        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
+        <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 border border-white/20 rounded-full flex items-center justify-center text-white font-semibold text-sm sm:text-base">
           {userInitials}
         </div>
         <div className="hidden sm:block text-left">
@@ -90,7 +90,7 @@ export const UserMenu: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-[var(--card)] border-2 border-[var(--border)] rounded-xl shadow-xl z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-[var(--card)] backdrop-blur-xl border border-[var(--border)] rounded-xl shadow-2xl shadow-black/40 z-50 overflow-hidden">
           <div className="p-3 border-b border-[var(--border)] bg-[var(--muted)]">
             <p className="text-sm font-semibold text-[var(--foreground)] truncate">
               {user?.name}

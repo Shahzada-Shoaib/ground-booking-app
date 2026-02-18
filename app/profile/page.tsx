@@ -14,6 +14,7 @@ import { useToast } from '@/lib/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
 import { formatDateShort } from '@/lib/utils/dateUtils';
 import apiService from '@/lib/utils/apiService';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 function ProfileContent() {
   const { user, isAuthenticated, isLoading: authLoading, refreshUser } = useAuth();
@@ -113,21 +114,7 @@ function ProfileContent() {
 
   return (
     <div className="min-h-screen bg-[var(--background)] pb-16 md:pb-0">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[var(--primary-600)] to-[var(--primary-700)] shadow-lg">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8 xl:py-12">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-            <div className="flex-1 min-w-0">
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-2 break-words">
-                My Profile
-              </h1>
-              <p className="text-white/90 text-xs sm:text-sm md:text-base lg:text-lg">
-                Manage your account information
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <PageHeader title="My Profile" subtitle="Manage your account information" />
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8">

@@ -12,6 +12,7 @@ import { useToast } from '@/lib/hooks/useToast';
 import { ToastContainer } from '@/components/ui/Toast';
 import { formatTime, formatTimeRange } from '@/lib/utils/dateUtils';
 import { GROUND_TYPES, getGroundTypeLabel } from '@/lib/utils/groundUtils';
+import { PageHeader } from '@/components/ui/PageHeader';
 
 function NewGroundPageContent() {
   const router = useRouter();
@@ -67,37 +68,27 @@ function NewGroundPageContent() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-[var(--background)] pb-16 md:pb-0">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-[var(--primary-600)] to-[var(--primary-700)] shadow-lg">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8 xl:py-12">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 sm:gap-3 mb-2">
-                <Button
-                  onClick={() => router.push('/dashboard')}
-                  variant="outline"
-                  className="bg-white/20 border-white/30 text-white hover:bg-white/30 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[44px]"
-                >
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                  </svg>
-                  <span className="hidden sm:inline">Back to Dashboard</span>
-                  <span className="sm:hidden">Back</span>
-                </Button>
-              </div>
-              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-1 sm:mb-2 break-words">
-                Create New Ground
-              </h1>
-              <p className="text-white/90 text-xs sm:text-sm md:text-base lg:text-lg">
-                Set up a new ground for bookings
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+  const backButton = (
+    <Button
+      onClick={() => router.push('/dashboard')}
+      variant="outline"
+      className="bg-white/10 border-white/20 text-white hover:bg-white/20 text-xs sm:text-sm px-2 sm:px-3 py-1.5 sm:py-2 min-h-[36px] sm:min-h-[44px]"
+    >
+      <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      <span className="hidden sm:inline">Back to Dashboard</span>
+      <span className="sm:hidden">Back</span>
+    </Button>
+  );
 
+  return (
+    <div className="min-h-screen pb-16 md:pb-0">
+      <PageHeader
+        title="Create New Ground"
+        subtitle="Set up a new ground for bookings"
+        topContent={backButton}
+      />
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4 md:py-6 lg:py-8">
         <Card className="shadow-xl border-2 border-[var(--primary-200)]" variant="elevated">

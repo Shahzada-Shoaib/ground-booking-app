@@ -463,7 +463,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                         <p className="text-white/80 text-xs sm:text-sm font-medium mb-1">Total Bookings</p>
                         <p className="text-2xl sm:text-3xl font-bold">{totalBookings}</p>
                       </div>
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-xl flex items-center justify-center">
                         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
@@ -472,7 +472,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border-2 border-[var(--primary-300)] shadow-xl">
+                <Card className="border-2 border-[var(--primary-300)] shadow-xl">
                   <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -480,7 +480,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                         <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">{todayBookings}</p>
                         <p className="text-2xl sm:text-3xl font-bold">{todayBookings}</p>
                       </div>
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-xl flex items-center justify-center">
                         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -489,7 +489,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                   </CardContent>
                 </Card>
 
-                <Card className="bg-white border-2 border-[var(--primary-400)] shadow-xl">
+                <Card className="border-2 border-[var(--primary-400)] shadow-xl">
                   <CardContent className="p-4 sm:p-5 lg:p-6">
                     <div className="flex items-center justify-between">
                       <div>
@@ -497,7 +497,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                         <p className="text-2xl sm:text-3xl font-bold text-[var(--foreground)]">Rs. {totalRevenue.toLocaleString()}</p>
                         <p className="text-2xl sm:text-3xl font-bold">Rs. {totalRevenue.toLocaleString()}</p>
                       </div>
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/10 rounded-xl flex items-center justify-center">
                         <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>

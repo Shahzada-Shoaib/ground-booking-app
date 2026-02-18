@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { BottomNavigation } from "@/components/ui/BottomNavigation";
 import { AuthProvider } from "@/context/AuthContext";
+import { AppShellBackground } from "@/components/AppShellBackground";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Cricket Ground Booking",
   description: "Book your cricket ground time slots easily and efficiently",
-  themeColor: "#3b82f6",
+  themeColor: "#0c0c0e",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -34,7 +35,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, viewport-fit=cover" />
-        <meta name="theme-color" content="#3b82f6" />
+        <meta name="theme-color" content="#0c0c0e" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="Ground Booking" />
@@ -43,7 +44,9 @@ export default function RootLayout({
             className={`${geistSans.variable} ${geistMono.variable} antialiased pb-16 md:pb-0`}
           >
             <AuthProvider>
-              {children}
+              <AppShellBackground>
+                {children}
+              </AppShellBackground>
               <BottomNavigation />
             </AuthProvider>
           </body>

@@ -23,7 +23,7 @@ export const TimeSlot: React.FC<TimeSlotProps> = ({
       return 'bg-[var(--primary-600)] text-white border-[var(--primary-600)] shadow-md transform scale-105';
     }
     if (slot.available) {
-      return 'bg-white text-[var(--primary-600)] border-[var(--border)] hover:bg-[var(--primary-50)] hover:text-[var(--primary-700)] hover:border-[var(--primary-300)] cursor-pointer';
+      return 'bg-[var(--card)] text-[var(--primary-400)] border-[var(--primary-500)] hover:bg-[var(--primary-500)]/20 hover:text-[var(--primary-300)] hover:border-[var(--primary-400)] cursor-pointer';
     }
     return 'bg-[var(--gray-200)] text-[var(--gray-500)] cursor-not-allowed border-[var(--gray-300)] dark:bg-[var(--gray-800)] dark:text-[var(--gray-500)] dark:border-[var(--gray-700)]';
   };

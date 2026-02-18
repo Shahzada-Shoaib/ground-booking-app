@@ -54,14 +54,14 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/50 backdrop-blur-sm safe-top safe-bottom"
+      className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/60 backdrop-blur-sm safe-top safe-bottom"
       onClick={onClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
       <div
-        className={`bg-[var(--card)] rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl ${sizes[size]} w-full h-[75vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden`}
+        className={`bg-[var(--card)] backdrop-blur-xl border border-[var(--border)] rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl ${sizes[size]} w-full h-[75vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden`}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (

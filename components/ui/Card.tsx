@@ -4,7 +4,7 @@ interface CardProps {
   children: React.ReactNode;
   className?: string;
   padding?: 'none' | 'sm' | 'md' | 'lg';
-  variant?: 'default' | 'bordered' | 'elevated';
+  variant?: 'default' | 'bordered' | 'elevated' | 'accentTop';
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -21,15 +21,21 @@ export const Card: React.FC<CardProps> = ({
   };
 
   const variantClasses = {
-    default: 'bg-[var(--card)] border border-[var(--border)]',
-    bordered: 'bg-transparent border-2 border-[var(--border)]',
-    elevated: 'bg-[var(--card)] shadow-lg shadow-black/5 dark:shadow-black/20',
+    default: 'bg-[var(--card)] border border-[var(--border)] backdrop-blur-xl rounded-2xl shadow-xl shadow-black/20',
+    bordered: 'bg-[var(--card)] border-2 border-[var(--border)] backdrop-blur-xl rounded-2xl',
+    elevated: 'bg-[var(--card)] border border-[var(--border)] backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/30',
+    accentTop: 'bg-[var(--card)] border border-[var(--border)] backdrop-blur-xl rounded-2xl shadow-xl shadow-black/20 relative overflow-hidden',
   };
+
+  const hasAccentBar = variant === 'accentTop';
 
   return (
     <div
-      className={`rounded-xl transition-all duration-200 ${variantClasses[variant]} ${paddingClasses[padding]} ${className}`}
+      className={`transition-all duration-200 ${variantClasses[variant]} ${paddingClasses[padding]} ${className}`}
     >
+      {hasAccentBar && (
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#a3e635] via-[#84cc16] to-[#65a30d]" />
+      )}
       {children}
     </div>
   );

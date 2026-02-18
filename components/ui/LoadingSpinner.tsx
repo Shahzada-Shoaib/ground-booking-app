@@ -18,7 +18,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
-      <FiRefreshCw className={`animate-spin text-[var(--primary-600)] ${sizes[size]}`} />
+      <FiRefreshCw className={`animate-spin text-[var(--primary-400)] ${sizes[size]}`} />
     </div>
   );
 };

@@ -75,15 +75,15 @@ export const BookingAnalytics: React.FC<BookingAnalyticsProps> = ({
             <p className="text-xs font-medium text-[var(--primary-700)] mb-1">Total Bookings</p>
             <p className="text-3xl font-bold text-[var(--primary-900)]">{totalBookings}</p>
           </div>
-          <div className="p-4 bg-white border-2 border-[var(--primary-300)] rounded-xl">
+          <div className="p-4 bg-[var(--card)] border-2 border-[var(--primary-300)] rounded-xl">
             <p className="text-xs font-medium text-[var(--muted-foreground)] mb-1">Total Revenue</p>
             <p className="text-3xl font-bold text-[var(--foreground)]">Rs. {totalRevenue.toLocaleString()}</p>
           </div>
-          <div className="p-4 bg-white border-2 border-[var(--primary-400)] rounded-xl">
+          <div className="p-4 bg-[var(--card)] border-2 border-[var(--primary-400)] rounded-xl">
             <p className="text-xs font-medium text-[var(--muted-foreground)] mb-1">Total Hours</p>
             <p className="text-3xl font-bold text-[var(--foreground)]">{totalHours}</p>
           </div>
-          <div className="p-4 bg-white border-2 border-[var(--primary-500)] rounded-xl">
+          <div className="p-4 bg-[var(--card)] border-2 border-[var(--primary-500)] rounded-xl">
             <p className="text-xs font-medium text-[var(--muted-foreground)] mb-1">Avg. Booking</p>
             <p className="text-3xl font-bold text-[var(--foreground)]">Rs. {Math.round(avgBookingValue).toLocaleString()}</p>
           </div>

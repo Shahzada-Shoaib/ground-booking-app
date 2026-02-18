@@ -139,7 +139,7 @@ export const BottomNavigation: React.FC = () => {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[var(--card)] border-t-2 border-[var(--border)] shadow-lg safe-bottom">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-[var(--card)]/80 backdrop-blur-xl border-t border-[var(--border)] shadow-lg safe-bottom">
       <div className="flex items-center justify-around h-16 px-2">
         {navItems.map((item) => {
           const active = isActive(item.path);
@@ -148,10 +148,10 @@ export const BottomNavigation: React.FC = () => {
               key={item.path}
               onClick={() => handleNavClick(item.path, item.label)}
               className={`
-                flex flex-col items-center justify-center flex-1 h-full min-h-[44px] px-2 py-1
+                relative flex flex-col items-center justify-center flex-1 h-full min-h-[44px] px-2 py-1
                 transition-all duration-200 active:scale-95
                 ${active
-                  ? 'text-[var(--primary-600)]'
+                  ? 'text-[var(--primary-400)]'
                   : 'text-[var(--muted-foreground)] hover:text-[var(--foreground)]'
                 }
               `}
@@ -165,12 +165,12 @@ export const BottomNavigation: React.FC = () => {
               </div>
               <span className={`
                 text-[10px] font-semibold leading-tight
-                ${active ? 'text-[var(--primary-600)]' : 'text-[var(--muted-foreground)]'}
+                ${active ? 'text-[var(--primary-400)]' : 'text-[var(--muted-foreground)]'}
               `}>
                 {item.label}
               </span>
               {active && (
-                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-1 bg-[var(--primary-600)] rounded-t-full" />
+                <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-0.5 bg-[var(--primary-400)] rounded-t-full" />
               )}
             </button>
           );
