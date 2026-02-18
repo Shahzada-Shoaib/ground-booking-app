@@ -65,10 +65,13 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    const affectedCount =
+      'modifiedCount' in result ? (result.modifiedCount ?? 0) : (result.deletedCount ?? 0);
+
     return NextResponse.json({
       success: true,
       data: {
-        modifiedCount: result.modifiedCount || result.deletedCount || 0,
+        modifiedCount: affectedCount,
       },
       message: `${validatedData.action} operation completed successfully`,
     });
