@@ -26,6 +26,7 @@ export interface Ground {
 export interface Booking {
   id: string;
   groundId: string;
+  userId?: string; // Set when user is logged in
   customerName: string;
   customerPhone: string;
   customerEmail: string;
