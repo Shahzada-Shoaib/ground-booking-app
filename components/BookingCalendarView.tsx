@@ -53,7 +53,7 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Bookings Calendar</CardTitle>
-              <p className="text-sm text-[var(--muted-foreground)] mt-1">View bookings by date</p>
+              <p className="text-sm text-[var(--primary-700)] mt-1 font-medium">View bookings by date</p>
             </div>
           </div>
         </CardHeader>
@@ -118,20 +118,20 @@ export const BookingCalendarView: React.FC<BookingCalendarViewProps> = ({
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-[var(--primary-50)] rounded-lg">
-                <p className="text-xs text-[var(--muted-foreground)] mb-1">Customer</p>
-                <p className="font-semibold text-[var(--foreground)]">{selectedBooking.customerName}</p>
+                <p className="text-xs text-[var(--primary-700)] mb-1 font-medium">Customer</p>
+                <p className="font-semibold text-[var(--primary-800)]">{selectedBooking.customerName}</p>
               </div>
               <div className="p-3 bg-[var(--primary-50)] rounded-lg">
-                <p className="text-xs text-[var(--muted-foreground)] mb-1">Date</p>
-                <p className="font-semibold text-[var(--foreground)]">{formatDateShort(selectedBooking.date)}</p>
+                <p className="text-xs text-[var(--primary-700)] mb-1 font-medium">Date</p>
+                <p className="font-semibold text-[var(--primary-800)]">{formatDateShort(selectedBooking.date)}</p>
               </div>
               <div className="p-3 bg-[var(--primary-50)] rounded-lg">
-                <p className="text-xs text-[var(--muted-foreground)] mb-1">Time</p>
-                <p className="font-semibold text-[var(--foreground)]">{formatTimeRange(selectedBooking.startTime, selectedBooking.endTime)}</p>
+                <p className="text-xs text-[var(--primary-700)] mb-1 font-medium">Time</p>
+                <p className="font-semibold text-[var(--primary-800)]">{formatTimeRange(selectedBooking.startTime, selectedBooking.endTime)}</p>
               </div>
               <div className="p-3 bg-[var(--primary-50)] rounded-lg">
-                <p className="text-xs text-[var(--muted-foreground)] mb-1">Amount</p>
-                <p className="font-semibold text-[var(--foreground)]">Rs. {selectedBooking.totalPrice}</p>
+                <p className="text-xs text-[var(--primary-700)] mb-1 font-medium">Amount</p>
+                <p className="font-semibold text-[var(--primary-800)]">Rs. {selectedBooking.totalPrice}</p>
               </div>
             </div>
             <div className="pt-4 border-t border-[var(--border)] space-y-2">

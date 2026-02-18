@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Ground, BookingFormData } from '@/lib/types';
-import { formatDateShort, formatTimeRange } from '@/lib/utils/dateUtils';
+import { formatDateShort, formatTimeRange, formatTime } from '@/lib/utils/dateUtils';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
 import { Button } from './ui/Button';
 
@@ -11,6 +11,7 @@ interface BookingSummaryProps {
   selectedDate: string | null;
   selectedStartTime: number | null;
   selectedEndTime: number | null;
+  selectedSlots?: Record<string, number[]>; // All dates' selected slots: { "2026-02-19": [9, 10, 11], "2026-02-20": [14, 15] }
   formData?: BookingFormData; // Customer details for confirmation
   showConfirmButton?: boolean; // Show confirm button (mobile flow)
   onConfirmBooking?: () => void; // Callback for confirm action
@@ -24,6 +25,7 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   selectedDate,
   selectedStartTime,
   selectedEndTime,
+  selectedSlots,
   formData,
   showConfirmButton = false,
   onConfirmBooking,
@@ -31,12 +33,27 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
   onEditDate,
   onEditTime,
 }) => {
-  const hours = selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0
-    ? selectedEndTime - selectedStartTime
+  // Calculate totals from selectedSlots if provided, otherwise use legacy time range
+  const datesWithSlots = selectedSlots && Object.keys(selectedSlots).length > 0
+    ? Object.entries(selectedSlots)
+        .filter(([_, slots]) => slots.length > 0)
+        .sort(([date1], [date2]) => date1.localeCompare(date2))
+    : [];
+
+  const totalSlots = datesWithSlots.length > 0
+    ? datesWithSlots.reduce((sum, [_, slots]) => sum + slots.length, 0)
     : 0;
+
+  const hours = datesWithSlots.length > 0
+    ? totalSlots // Each slot is 1 hour
+    : (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0
+      ? selectedEndTime - selectedStartTime
+      : 0);
+
   const totalPrice = hours * ground.pricePerHour;
 
-  const hasSelection = selectedDate && selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0;
+  const hasSelection = datesWithSlots.length > 0 || (selectedDate && selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0);
+  const hasMultiDate = datesWithSlots.length > 1;
 
   // If showing in modal (with confirm button), don't use Card wrapper
   if (showConfirmButton) {
@@ -49,13 +66,12 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
           <p className="text-[10px] text-[var(--muted-foreground)]">Rs. {ground.pricePerHour.toLocaleString()}/hr</p>
         </div>
 
-        {/* Date & Time - Side by Side */}
-        <div className="grid grid-cols-2 gap-2.5 pb-2 border-b border-[var(--border)]">
-          {/* Date Selection */}
-          <div>
+        {/* Date & Time - Multi-date or Single date view */}
+        {hasMultiDate ? (
+          <div className="pb-2 border-b border-[var(--border)] space-y-2.5">
             <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-[var(--muted-foreground)]">Date</p>
-              {selectedDate && onEditDate && (
+              <p className="text-xs font-medium text-[var(--muted-foreground)]">Selected Dates & Times</p>
+              {onEditDate && (
                 <button
                   onClick={onEditDate}
                   className="text-[10px] text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
@@ -64,52 +80,109 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
                 </button>
               )}
             </div>
-            {selectedDate ? (
-              <div className="flex items-center space-x-1.5">
-                <div className="w-6 h-6 bg-[var(--muted)] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3 h-3 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
+            <div className="space-y-2.5">
+              {datesWithSlots.map(([date, slots]) => (
+                <div key={date} className="bg-[var(--muted)]/30 rounded-lg p-2 space-y-1.5">
+                  <div className="flex items-center space-x-1.5">
+                    <div className="w-5 h-5 bg-[var(--primary-100)] rounded flex items-center justify-center flex-shrink-0">
+                      <svg className="w-3 h-3 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-xs font-semibold text-[var(--foreground)]">{formatDateShort(date)}</p>
+                    <span className="text-[9px] text-[var(--muted-foreground)]">({slots.length} slot{slots.length > 1 ? 's' : ''})</span>
+                  </div>
+                  <div className="pl-6 space-y-1">
+                    {slots.map((slotHour) => (
+                      <div key={slotHour} className="flex items-center space-x-1.5">
+                        <div className="w-4 h-4 bg-[var(--muted)] rounded flex items-center justify-center flex-shrink-0">
+                          <svg className="w-2.5 h-2.5 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <p className="text-[10px] font-medium text-[var(--foreground)]">
+                          {formatTime(slotHour)} - {formatTime(slotHour + 1)}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-xs font-semibold text-[var(--foreground)] leading-tight">{formatDateShort(selectedDate)}</p>
-              </div>
-            ) : (
-              <p className="text-[10px] text-[var(--muted-foreground)] italic">Not selected</p>
-            )}
+              ))}
+            </div>
           </div>
-
-          {/* Time Selection */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <p className="text-xs font-medium text-[var(--muted-foreground)]">Time</p>
-              {hasSelection && onEditTime && (
-                <button
-                  onClick={onEditTime}
-                  className="text-[10px] text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
-                >
-                  Change
-                </button>
+        ) : (
+          <div className="grid grid-cols-2 gap-2.5 pb-2 border-b border-[var(--border)]">
+            {/* Date Selection */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-medium text-[var(--muted-foreground)]">Date</p>
+                {selectedDate && onEditDate && (
+                  <button
+                    onClick={onEditDate}
+                    className="text-[10px] text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
+                  >
+                    Change
+                  </button>
+                )}
+              </div>
+              {selectedDate ? (
+                <div className="flex items-center space-x-1.5">
+                  <div className="w-6 h-6 bg-[var(--muted)] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-xs font-semibold text-[var(--foreground)] leading-tight">{formatDateShort(selectedDate)}</p>
+                </div>
+              ) : (
+                <p className="text-[10px] text-[var(--muted-foreground)] italic">Not selected</p>
               )}
             </div>
-            {hasSelection ? (
-              <div className="flex items-center space-x-1.5">
-                <div className="w-6 h-6 bg-[var(--muted)] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <svg className="w-3 h-3 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-xs font-semibold text-[var(--foreground)] leading-tight">
-                    {formatTimeRange(selectedStartTime!, selectedEndTime!)}
-                  </p>
-                  <p className="text-[9px] text-[var(--muted-foreground)]">{hours}h</p>
-                </div>
+
+            {/* Time Selection */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-xs font-medium text-[var(--muted-foreground)]">Time</p>
+                {hasSelection && onEditTime && (
+                  <button
+                    onClick={onEditTime}
+                    className="text-[10px] text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
+                  >
+                    Change
+                  </button>
+                )}
               </div>
-            ) : (
-              <p className="text-[10px] text-[var(--muted-foreground)] italic">Not selected</p>
-            )}
+              {hasSelection ? (
+                <div className="flex items-center space-x-1.5">
+                  <div className="w-6 h-6 bg-[var(--muted)] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg className="w-3 h-3 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    {datesWithSlots.length > 0 && datesWithSlots[0][1].length > 0 ? (
+                      <>
+                        <p className="text-xs font-semibold text-[var(--foreground)] leading-tight">
+                          {datesWithSlots[0][1].length} slot{datesWithSlots[0][1].length > 1 ? 's' : ''}
+                        </p>
+                        <p className="text-[9px] text-[var(--muted-foreground)]">{hours}h</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-xs font-semibold text-[var(--foreground)] leading-tight">
+                          {formatTimeRange(selectedStartTime!, selectedEndTime!)}
+                        </p>
+                        <p className="text-[9px] text-[var(--muted-foreground)]">{hours}h</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-[10px] text-[var(--muted-foreground)] italic">Not selected</p>
+              )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Customer Details - Compact Grid */}
         {formData && (
@@ -192,66 +265,136 @@ export const BookingSummary: React.FC<BookingSummaryProps> = ({
             <p className="text-xs text-[var(--muted-foreground)] mt-1">Rs. {ground.pricePerHour.toLocaleString()} per hour</p>
           </div>
 
-          {/* Date Selection */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-[var(--muted-foreground)]">Date</p>
-              {selectedDate && onEditDate && (
-                <button
-                  onClick={onEditDate}
-                  className="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
-                >
-                  Change
-                </button>
-              )}
-            </div>
-            {selectedDate ? (
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-[var(--muted)] rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-                <p className="text-sm font-semibold text-[var(--foreground)]">{formatDateShort(selectedDate)}</p>
+          {/* Date & Time - Multi-date or Single date view */}
+          {hasMultiDate ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm font-medium text-[var(--muted-foreground)]">Selected Dates & Times</p>
+                {onEditDate && (
+                  <button
+                    onClick={onEditDate}
+                    className="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
+                  >
+                    Change
+                  </button>
+                )}
               </div>
-            ) : (
-              <p className="text-sm text-[var(--muted-foreground)] italic">Not selected</p>
-            )}
-          </div>
+              <div className="space-y-3">
+                {datesWithSlots.map(([date, slots]) => (
+                  <div key={date} className="bg-[var(--muted)]/30 rounded-lg p-3 space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-8 h-8 bg-[var(--primary-100)] rounded-lg flex items-center justify-center flex-shrink-0">
+                        <svg className="w-4 h-4 text-[var(--primary-600)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-[var(--foreground)]">{formatDateShort(date)}</p>
+                        <p className="text-xs text-[var(--muted-foreground)]">{slots.length} slot{slots.length > 1 ? 's' : ''} selected</p>
+                      </div>
+                    </div>
+                    <div className="pl-10 space-y-1.5">
+                      {slots.map((slotHour) => (
+                        <div key={slotHour} className="flex items-center space-x-2">
+                          <div className="w-5 h-5 bg-[var(--muted)] rounded flex items-center justify-center flex-shrink-0">
+                            <svg className="w-3 h-3 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                          </div>
+                          <p className="text-xs font-medium text-[var(--foreground)]">
+                            {formatTime(slotHour)} - {formatTime(slotHour + 1)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Date Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-[var(--muted-foreground)]">Date</p>
+                  {selectedDate && onEditDate && (
+                    <button
+                      onClick={onEditDate}
+                      className="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
+                    >
+                      Change
+                    </button>
+                  )}
+                </div>
+                {selectedDate ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="w-8 h-8 bg-[var(--muted)] rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm font-semibold text-[var(--foreground)]">{formatDateShort(selectedDate)}</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--muted-foreground)] italic">Not selected</p>
+                )}
+              </div>
 
-          {/* Time Selection */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-sm font-medium text-[var(--muted-foreground)]">Time</p>
-              {hasSelection && onEditTime && (
-                <button
-                  onClick={onEditTime}
-                  className="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
-                >
-                  Change
-                </button>
-              )}
-            </div>
-            {hasSelection ? (
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-[var(--muted)] rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-[var(--foreground)]">
-                      {formatTimeRange(selectedStartTime!, selectedEndTime!)}
-                    </p>
-                    <p className="text-xs text-[var(--muted-foreground)]">{hours} hour{hours !== 1 ? 's' : ''}</p>
-                  </div>
+              {/* Time Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm font-medium text-[var(--muted-foreground)]">Time</p>
+                  {hasSelection && onEditTime && (
+                    <button
+                      onClick={onEditTime}
+                      className="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-medium"
+                    >
+                      Change
+                    </button>
+                  )}
                 </div>
+                {hasSelection ? (
+                  <div className="space-y-2">
+                    {datesWithSlots.length > 0 && datesWithSlots[0][1].length > 0 ? (
+                      <div className="space-y-1.5">
+                        {datesWithSlots[0][1].map((slotHour) => (
+                          <div key={slotHour} className="flex items-center space-x-2">
+                            <div className="w-8 h-8 bg-[var(--muted)] rounded-lg flex items-center justify-center">
+                              <svg className="w-4 h-4 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="text-sm font-semibold text-[var(--foreground)]">
+                                {formatTime(slotHour)} - {formatTime(slotHour + 1)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        <p className="text-xs text-[var(--muted-foreground)] pl-10">{hours} hour{hours !== 1 ? 's' : ''} total</p>
+                      </div>
+                    ) : (
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-[var(--muted)] rounded-lg flex items-center justify-center">
+                          <svg className="w-4 h-4 text-[var(--foreground)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-[var(--foreground)]">
+                            {formatTimeRange(selectedStartTime!, selectedEndTime!)}
+                          </p>
+                          <p className="text-xs text-[var(--muted-foreground)]">{hours} hour{hours !== 1 ? 's' : ''}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[var(--muted-foreground)] italic">Not selected</p>
+                )}
               </div>
-            ) : (
-              <p className="text-sm text-[var(--muted-foreground)] italic">Not selected</p>
-            )}
-          </div>
+            </>
+          )}
 
           {/* Customer Details (shown when formData is provided) */}
           {formData && (

@@ -186,7 +186,7 @@ export const BookingForm: React.FC<BookingFormProps> = ({
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
             <CardTitle className="text-lg sm:text-xl font-bold text-[var(--foreground)]">Your Information</CardTitle>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-1">Step 3 of 3 - Almost done!</p>
+            <p className="text-xs sm:text-sm text-[var(--primary-700)] mt-1 font-medium">Step 3 of 3 - Almost done!</p>
           </div>
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[var(--primary-600)] rounded-full flex items-center justify-center flex-shrink-0">
             <FiUser className="w-5 h-5 sm:w-6 sm:h-6 text-white" />

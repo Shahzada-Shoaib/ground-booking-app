@@ -171,7 +171,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Statistics & Overview</CardTitle>
-              <p className="text-sm text-[var(--muted-foreground)] mt-1">Ground performance and booking statistics</p>
+              <p className="text-sm text-[var(--primary-700)] mt-1 font-medium">Ground performance and booking statistics</p>
             </div>
           </div>
         </CardHeader>
@@ -487,7 +487,7 @@ export const GroundManagement: React.FC<GroundManagementProps> = ({ ground }) =>
             </div>
             <div>
               <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Bookings Management</CardTitle>
-              <p className="text-sm text-[var(--muted-foreground)] mt-1">View and manage all your ground bookings</p>
+              <p className="text-sm text-[var(--primary-700)] mt-1 font-medium">View and manage all your ground bookings</p>
             </div>
           </div>
         </CardHeader>

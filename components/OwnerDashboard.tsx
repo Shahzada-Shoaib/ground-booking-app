@@ -304,7 +304,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
               <CardTitle className="text-2xl font-bold text-[var(--foreground)]">All Grounds</CardTitle>
-              <p className="text-sm text-[var(--muted-foreground)] mt-1">Manage multiple grounds and their bookings</p>
+              <p className="text-sm text-[var(--primary-700)] mt-1 font-medium">Manage multiple grounds and their bookings</p>
             </div>
             <Button
               onClick={handleAddNewGround}
@@ -380,11 +380,11 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
                     )}
                     <div className="grid grid-cols-2 gap-2 mb-3">
                       <div className="text-center p-2 bg-[var(--primary-50)] rounded-lg">
-                        <p className="text-xs text-[var(--muted-foreground)]">Bookings</p>
+                        <p className="text-xs text-[var(--primary-700)] font-medium">Bookings</p>
                         <p className="text-lg font-bold text-[var(--primary-600)]">{stats.totalBookings}</p>
                       </div>
                       <div className="text-center p-2 bg-[var(--primary-50)] rounded-lg">
-                        <p className="text-xs text-[var(--muted-foreground)]">Revenue</p>
+                        <p className="text-xs text-[var(--primary-700)] font-medium">Revenue</p>
                         <p className="text-lg font-bold text-[var(--primary-600)]">Rs. {stats.totalRevenue.toLocaleString()}</p>
                       </div>
                     </div>
@@ -418,7 +418,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               </svg>
             </div>
             <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">Select a Ground</h2>
-            <p className="text-[var(--muted-foreground)]">Click on a ground above to view and manage its details</p>
+            <p className="text-[var(--primary-700)] font-medium">Click on a ground above to view and manage its details</p>
           </CardContent>
         </Card>
       )}
@@ -433,7 +433,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
               </svg>
             </div>
             <h2 className="text-2xl sm:text-3xl font-bold text-[var(--foreground)] mb-3">Welcome to Ground Booking!</h2>
-            <p className="text-lg text-[var(--muted-foreground)] mb-8 max-w-2xl mx-auto">
+            <p className="text-lg text-[var(--primary-700)] mb-8 max-w-2xl mx-auto font-medium">
               Get started by creating your first ground. Set your operating hours, pricing, and start accepting bookings from customers.
             </p>
           </CardContent>

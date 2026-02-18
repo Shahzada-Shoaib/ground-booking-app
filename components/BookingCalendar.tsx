@@ -7,6 +7,7 @@ import { LoadingSpinner } from './ui/LoadingSpinner';
 import { Calendar } from './ui/Calendar';
 import { TimeSlotTimeline } from './TimeSlotTimeline';
 import { Card, CardContent } from './ui/Card';
+import { formatDateShort } from '@/lib/utils/dateUtils';
 
 interface BookingCalendarProps {
   ground: Ground;
@@ -15,7 +16,8 @@ interface BookingCalendarProps {
   selectedStartTime: number | null;
   selectedEndTime: number | null;
   onTimeSelection: (startTime: number, endTime: number) => void;
-  selectedSlots?: number[];
+  selectedSlots?: number[]; // Current date's slots
+  allSelectedSlots?: Record<string, number[]>; // All dates' slots
   onSlotToggle?: (hour: number) => void;
 }
 
@@ -27,9 +29,19 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
   selectedEndTime,
   onTimeSelection,
   selectedSlots,
+  allSelectedSlots,
   onSlotToggle,
 }) => {
   const { slots, isLoading } = useTimeSlots(ground.id, selectedDate);
+  
+  // Calculate overall selected slots across all dates
+  const datesWithSlots = allSelectedSlots && Object.keys(allSelectedSlots).length > 0
+    ? Object.entries(allSelectedSlots)
+        .filter(([_, slots]) => slots.length > 0)
+        .sort(([date1], [date2]) => date1.localeCompare(date2))
+    : [];
+  
+  const totalSlots = datesWithSlots.reduce((sum, [_, slots]) => sum + slots.length, 0);
 
   return (
     <Card className="shadow-lg border-2 border-[var(--border)]">
@@ -94,18 +106,41 @@ export const BookingCalendar: React.FC<BookingCalendarProps> = ({
           </div>
 
           {/* Price Summary */}
-          {((selectedSlots && selectedSlots.length > 0) || (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0)) && (
+          {((totalSlots > 0) || (selectedStartTime !== null && selectedEndTime !== null && selectedStartTime >= 0 && selectedEndTime >= 0)) && (
             <div className="mt-3 sm:mt-4 p-3 sm:p-4 bg-[var(--primary-50)] border-2 border-[var(--primary-200)] rounded-lg">
-              <p className="text-xs sm:text-sm font-semibold text-[var(--foreground)] mb-1">
+              <p className="text-xs sm:text-sm font-semibold text-[var(--primary-700)] mb-2">
                 Booking Summary
               </p>
-              <p className="text-xs sm:text-sm text-[var(--muted-foreground)] break-words">
-                {selectedSlots && selectedSlots.length > 0 ? (
-                  <>Total: Rs. {selectedSlots.length * ground.pricePerHour} ({selectedSlots.length} slot{selectedSlots.length > 1 ? 's' : ''} × Rs. {ground.pricePerHour}/hour)</>
-                ) : (
-                  <>Total: Rs. {(selectedEndTime! - selectedStartTime!) * ground.pricePerHour} ({selectedEndTime! - selectedStartTime!} hour{selectedEndTime! - selectedStartTime! > 1 ? 's' : ''} × Rs. {ground.pricePerHour}/hour)</>
-                )}
-              </p>
+              {totalSlots > 0 ? (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs sm:text-sm text-[var(--primary-800)] font-medium">
+                      {totalSlots} slot{totalSlots > 1 ? 's' : ''} selected
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold text-[var(--primary-700)]">
+                      Rs. {totalSlots * ground.pricePerHour}
+                    </span>
+                  </div>
+                  {datesWithSlots.length > 0 && (
+                    <div className="pt-2 border-t border-[var(--primary-300)] space-y-1.5">
+                      {datesWithSlots.map(([date, slots]) => (
+                        <div key={date} className="flex items-center justify-between text-[10px] sm:text-xs">
+                          <span className="text-[var(--primary-700)] font-medium">
+                            {formatDateShort(date)}: {slots.length} slot{slots.length > 1 ? 's' : ''}
+                          </span>
+                          <span className="text-[var(--primary-800)] font-semibold">
+                            Rs. {slots.length * ground.pricePerHour}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs sm:text-sm text-[var(--primary-700)] break-words font-medium">
+                  Total: Rs. {(selectedEndTime! - selectedStartTime!) * ground.pricePerHour} ({selectedEndTime! - selectedStartTime!} hour{selectedEndTime! - selectedStartTime! > 1 ? 's' : ''} × Rs. {ground.pricePerHour}/hour)
+                </p>
+              )}
             </div>
           )}
         </div>

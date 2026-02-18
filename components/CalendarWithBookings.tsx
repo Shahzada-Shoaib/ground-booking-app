@@ -133,7 +133,7 @@ export const CalendarWithBookings: React.FC<CalendarWithBookingsProps> = ({
           </svg>
         </button>
 
-        <h3 className="text-sm sm:text-base font-semibold text-[var(--foreground)] px-1 sm:px-2 text-center">
+        <h3 className="text-sm sm:text-base font-semibold text-[var(--primary-800)] px-1 sm:px-2 text-center">
           {monthYearLabel}
         </h3>
 

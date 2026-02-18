@@ -61,7 +61,7 @@ export const Modal: React.FC<ModalProps> = ({
       aria-labelledby={title ? 'modal-title' : undefined}
     >
       <div
-        className={`bg-[var(--card)] backdrop-blur-xl border border-[var(--border)] rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl ${sizes[size]} w-full h-[75vh] sm:h-auto sm:max-h-[90vh] flex flex-col overflow-hidden`}
+        className={`bg-[var(--card)] backdrop-blur-xl border border-[var(--border)] rounded-t-3xl sm:rounded-xl md:rounded-2xl shadow-2xl ${sizes[size]} w-full h-[90vh] sm:h-auto sm:max-h-[95vh] flex flex-col overflow-hidden`}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (

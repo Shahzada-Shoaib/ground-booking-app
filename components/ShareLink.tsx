@@ -48,15 +48,15 @@ export const ShareLink: React.FC<ShareLinkProps> = ({ groundId, groundName }) =>
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-[var(--foreground)]">Share Booking Link</CardTitle>
-            <p className="text-sm text-[var(--muted-foreground)] mt-1">Share this link with your customers</p>
+            <p className="text-sm text-[var(--primary-700)] mt-1 font-medium">Share this link with your customers</p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="p-4 sm:p-6">
         <div className="space-y-4 sm:space-y-5">
           <div className="p-3 sm:p-4 bg-[var(--primary-50)] border-2 border-[var(--primary-200)] rounded-xl">
-            <p className="text-xs sm:text-sm text-[var(--foreground)]">
-              <span className="font-semibold">💡 Tip:</span> Share this link with customers to allow them to book time slots for{' '}
+            <p className="text-xs sm:text-sm text-[var(--primary-800)]">
+              <span className="font-semibold text-[var(--primary-700)]">💡 Tip:</span> Share this link with customers to allow them to book time slots for{' '}
               <span className="font-bold">{groundName}</span>
             </p>
           </div>

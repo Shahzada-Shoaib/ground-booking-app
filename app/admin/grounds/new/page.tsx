@@ -96,7 +96,7 @@ function NewGroundPageContent() {
         <Card className="shadow-xl border-2 border-[var(--primary-200)]" variant="elevated">
           <CardHeader className="bg-[var(--primary-50)] dark:bg-[var(--primary-900)]/20 border-b border-[var(--primary-200)] p-3 sm:p-4 md:p-6">
             <CardTitle className="text-lg sm:text-xl md:text-2xl font-bold text-[var(--foreground)]">Ground Information</CardTitle>
-            <p className="text-xs sm:text-sm text-[var(--muted-foreground)] mt-1">Fill in the details to create your new ground</p>
+            <p className="text-xs sm:text-sm text-[var(--primary-700)] mt-1 font-medium">Fill in the details to create your new ground</p>
           </CardHeader>
           <CardContent className="p-3 sm:p-4 md:p-6">
             <div className="space-y-3 sm:space-y-4 md:space-y-5">
