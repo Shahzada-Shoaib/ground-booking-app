@@ -10,7 +10,7 @@ import { BookingsList } from './BookingsList';
 import apiService from '@/lib/utils/apiService';
 import { BookingService } from '@/lib/services/bookingService';
 import { Booking, Ground } from '@/lib/types';
-import { exportToCSV, exportToJSON } from '@/lib/utils/exportUtils';
+import { exportTableToCSV, exportTableToJSON } from '@/lib/utils/exportUtils';
 
 export const BookingsHistory: React.FC = () => {
   const router = useRouter();
@@ -117,10 +117,11 @@ export const BookingsHistory: React.FC = () => {
       };
     });
 
+    const dateStr = new Date().toISOString().split('T')[0];
     if (format === 'csv') {
-      exportToCSV(data, `bookings-${new Date().toISOString().split('T')[0]}.csv`);
+      exportTableToCSV(data, `bookings-${dateStr}.csv`);
     } else {
-      exportToJSON(data, `bookings-${new Date().toISOString().split('T')[0]}.json`);
+      exportTableToJSON(data, `bookings-${dateStr}.json`);
     }
   };
 
