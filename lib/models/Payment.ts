@@ -4,7 +4,6 @@ export type PaymentStatus = 'pending' | 'completed' | 'failed' | 'refunded';
 export type PaymentMethod = 'stripe' | 'jazzcash' | 'easypaisa' | 'cash' | 'other';
 
 export interface IPayment extends Document {
-  _id: string;
   bookingId: string;
   userId?: string;
   amount: number;

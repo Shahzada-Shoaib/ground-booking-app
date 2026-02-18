@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 
 export interface IReview extends Document {
-  _id: string;
   groundId: string;
   userId?: string;
   customerName: string;

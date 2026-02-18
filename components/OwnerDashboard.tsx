@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Ground, GroundSettings, GroundType } from '@/lib/types';
+import { Ground, GroundSettings, GroundType, Booking } from '@/lib/types';
 import { BookingService } from '@/lib/services/bookingService';
 import { useBookingContext } from '@/context/BookingContext';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
@@ -56,6 +56,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     bookings: false,
   });
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [allBookingsForStats, setAllBookingsForStats] = useState<Booking[]>([]);
   const { showSuccess, showError, toasts, removeToast } = useToast();
   const { bookings, isLoading, refreshBookings, cancelBooking } = useBookings(ground?.id);
 
@@ -68,19 +69,34 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
 
   // Migrate existing grounds without type (backward compatibility)
   useEffect(() => {
-    const allGrounds = BookingService.getAllGrounds();
-    let needsMigration = false;
-    allGrounds.forEach(g => {
-      if (!('type' in g) || !g.type) {
-        needsMigration = true;
-        BookingService.updateGround(g.id, { type: 'cricket' });
+    let cancelled = false;
+    (async () => {
+      const allGrounds = await BookingService.getAllGrounds();
+      if (cancelled) return;
+      let needsMigration = false;
+      for (const g of allGrounds) {
+        if (!('type' in g) || !g.type) {
+          needsMigration = true;
+          await BookingService.updateGround(g.id, { type: 'cricket' });
+          if (cancelled) return;
+        }
       }
-    });
-    if (needsMigration) {
-      refreshGrounds();
-    }
+      if (needsMigration) {
+        await refreshGrounds();
+      }
+    })();
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run once on mount
+
+  // Load all bookings for per-ground stats in the list
+  useEffect(() => {
+    let cancelled = false;
+    BookingService.getBookings().then((list) => {
+      if (!cancelled) setAllBookingsForStats(list);
+    });
+    return () => { cancelled = true; };
+  }, [grounds.length]);
 
   useEffect(() => {
     if (ground) {
@@ -127,7 +143,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     if (!ground || showAddGround) {
       setIsSaving(true);
       try {
-        const newGround = BookingService.createGround({
+        const newGround = await BookingService.createGround({
           name: settings.name,
           type: settings.type,
           ownerName: settings.ownerName,
@@ -138,9 +154,13 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
           },
           pricePerHour: settings.pricePerHour,
         });
-        onGroundUpdate(newGround);
-        setShowAddGround(false);
-        showSuccess('Ground created successfully!');
+        if (newGround) {
+          onGroundUpdate(newGround);
+          setShowAddGround(false);
+          showSuccess('Ground created successfully!');
+        } else {
+          showError('Failed to create ground. Please try again.');
+        }
       } catch (error) {
         showError('Failed to create ground. Please try again.');
       } finally {
@@ -149,7 +169,7 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     } else {
       setIsSaving(true);
       try {
-        const updated = BookingService.updateGround(ground.id, {
+        const updated = await BookingService.updateGround(ground.id, {
           name: settings.name,
           type: settings.type,
           ownerName: settings.ownerName,
@@ -179,9 +199,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (groundToDelete) {
-      const success = deleteGround(groundToDelete.id);
+      const success = await deleteGround(groundToDelete.id);
       if (success) {
         showSuccess('Ground deleted successfully!');
         setShowDeleteModal(false);
@@ -211,10 +231,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
     });
   };
 
-  const handleCancelBooking = (bookingId: string) => {
-    const success = cancelBooking(bookingId);
+  const handleCancelBooking = async (bookingId: string) => {
+    const success = await cancelBooking(bookingId);
     if (success) {
-      refreshBookings();
       showSuccess('Booking cancelled successfully');
     } else {
       showError('Failed to cancel booking. Please try again.');
@@ -245,9 +264,9 @@ export const OwnerDashboard: React.FC<OwnerDashboardProps> = ({
   }).length;
   const totalRevenue = bookings.reduce((sum, b) => sum + b.totalPrice, 0);
 
-  // Calculate stats for each ground
+  // Calculate stats for each ground (uses pre-fetched allBookingsForStats)
   const getGroundStats = (groundId: string) => {
-    const groundBookings = BookingService.getBookings(groundId);
+    const groundBookings = allBookingsForStats.filter((b) => b.groundId === groundId);
     const totalBookings = groundBookings.length;
     const totalRevenue = groundBookings.reduce((sum, b) => sum + b.totalPrice, 0);
     return { totalBookings, totalRevenue };

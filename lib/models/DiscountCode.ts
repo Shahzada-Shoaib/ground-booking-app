@@ -4,7 +4,6 @@ export type DiscountType = 'percentage' | 'fixed';
 export type DiscountStatus = 'active' | 'inactive' | 'expired';
 
 export interface IDiscountCode extends Document {
-  _id: string;
   code: string;
   type: DiscountType;
   value: number; // Percentage (0-100) or fixed amount

@@ -4,7 +4,6 @@ export type NotificationType = 'booking_confirmed' | 'booking_cancelled' | 'book
 export type NotificationChannel = 'email' | 'sms' | 'in_app' | 'push';
 
 export interface INotification extends Document {
-  _id: string;
   userId?: string;
   bookingId?: string;
   type: NotificationType;

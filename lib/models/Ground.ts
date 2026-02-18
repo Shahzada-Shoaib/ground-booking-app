@@ -3,7 +3,6 @@ import mongoose, { Schema, Document, Model } from 'mongoose';
 export type GroundType = 'cricket' | 'padel' | 'football' | 'tennis' | 'basketball' | 'badminton' | 'other';
 
 export interface IGround extends Document {
-  _id: string;
   name: string;
   type: GroundType;
   ownerName: string;

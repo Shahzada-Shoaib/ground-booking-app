@@ -4,7 +4,6 @@ export type BookingStatus = 'pending' | 'confirmed' | 'cancelled' | 'completed';
 export type BookingType = 'single' | 'recurring';
 
 export interface IBooking extends Document {
-  _id: string;
   groundId: string;
   userId?: string; // If user is logged in
   customerName: string;

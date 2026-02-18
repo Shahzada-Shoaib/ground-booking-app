@@ -56,7 +56,7 @@ export const MapSection: React.FC<MapSectionProps> = ({ ground }) => {
       {canEmbed ? (
         <div className="relative w-full h-[180px] sm:h-[220px] md:h-[250px] lg:h-[300px] rounded-lg overflow-hidden border border-[var(--border)] mb-2 sm:mb-3">
           <iframe
-            src={embedUrl}
+            src={embedUrl ?? ''}
             width="100%"
             height="100%"
             style={{ border: 0 }}
